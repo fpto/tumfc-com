@@ -1,27 +1,22 @@
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import WhatIsMFC from "@/components/WhatIsMFC";
-import Benefits from "@/components/Benefits";
-import Testimonials from "@/components/Testimonials";
-import FAQ from "@/components/FAQ";
-import CTA from "@/components/CTA";
-import ContactForm from "@/components/ContactForm";
-import Footer from "@/components/Footer";
+import { Archivo, Cormorant_Garamond } from "next/font/google";
+import TableroMFC from "@/components/dashboard/TableroMFC";
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
+
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 export default function Home() {
   return (
-    <>
-      <Navbar />
-      <main>
-        <Hero />
-        <WhatIsMFC />
-        <Benefits />
-        <Testimonials />
-        <FAQ />
-        <CTA />
-        <ContactForm />
-      </main>
-      <Footer />
-    </>
+    <div className={`${cormorant.variable} ${archivo.variable}`}>
+      <TableroMFC />
+    </div>
   );
 }
