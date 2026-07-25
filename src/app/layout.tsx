@@ -8,25 +8,10 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "MFC Honduras — Movimiento Familiar Cristiano | Fortalecemos Familias",
+  title: "Tablero de Seguimiento — MFC San Pedro Sula",
   description:
-    "El Movimiento Familiar Cristiano de Honduras fortalece matrimonios y familias a través de comunidad, formación espiritual y acompañamiento. Únete y transforma tu hogar.",
-  keywords: [
-    "MFC Honduras",
-    "Movimiento Familiar Cristiano",
-    "matrimonios católicos",
-    "familias Honduras",
-    "espiritualidad familiar",
-    "comunidad católica",
-    "fortalecimiento matrimonial",
-  ],
-  openGraph: {
-    title: "MFC Honduras — Fortalecemos Familias",
-    description:
-      "Únete al Movimiento Familiar Cristiano y descubre una comunidad que transforma matrimonios y familias.",
-    type: "website",
-    locale: "es_HN",
-  },
+    "Tablero interno de seguimiento del Ciclo Básico de Formación: membresía por parroquia y nivel, historial de cortes y jornadas conyugales.",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, Cloud, CloudOff, KeyRound, LoaderCircle, TriangleAlert } from "lucide-react";
+import { Cloud, CloudOff, KeyRound, LoaderCircle, TriangleAlert } from "lucide-react";
 import {
   PARROQUIAS,
   SEED_EBF,
@@ -256,16 +255,7 @@ export default function TableroMFC() {
             <div className="text-[11px] uppercase tracking-[.18em] text-[#C9B36A]">
               Movimiento Familiar Cristiano · Arquidiócesis de San Pedro Sula
             </div>
-            <div className="flex shrink-0 items-center gap-4">
-              <ChipSync sync={sync} reintentar={() => void enviar()} />
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1 text-xs text-white/50 transition-colors hover:text-white"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-                Volver al sitio
-              </Link>
-            </div>
+            <ChipSync sync={sync} reintentar={() => void enviar()} />
           </div>
           <h1 className="tablero-display mb-0.5 mt-1 text-3xl font-bold">
             Área I — El MFC y su Mística
