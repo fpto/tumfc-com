@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Cloud, CloudOff, KeyRound, LoaderCircle, TriangleAlert } from "lucide-react";
 import {
   PARROQUIAS,
   SEED_EBF,
@@ -28,11 +28,35 @@ import Jornadas from "./Jornadas";
 type Tab = "panorama" | "historial" | "jornadas";
 type Metrica = "ebf" | "mat";
 
+// Estado de sincronización con la nube:
+//  - "local": sin base de datos configurada; solo se guarda en este navegador
+//  - "clave": el servidor exige la clave de edición y aún no la tenemos
+type Sync = "guardado" | "guardando" | "error" | "clave" | "local";
+
+const CLAVE_KEY = "mfc-tablero-clave";
+
 const TABS: [Tab, string][] = [
   ["panorama", "Membresía"],
   ["historial", "Historial"],
   ["jornadas", "Jornadas conyugales"],
 ];
+
+function leerLocal(): Partial<DatosTablero> | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Partial<DatosTablero>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function escribirLocal(datos: DatosTablero) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+  } catch {
+    // sin espacio o modo privado: la copia local es solo un respaldo
+  }
+}
 
 export default function TableroMFC() {
   const [cargando, setCargando] = useState(true);
@@ -42,54 +66,115 @@ export default function TableroMFC() {
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [jornadas, setJornadas] = useState<Jornada[]>([]);
   const [aviso, setAviso] = useState("");
+  const [sync, setSync] = useState<Sync>("guardado");
+  const [claveInput, setClaveInput] = useState("");
 
-  // Cargar del navegador. El primer render (servidor y cliente) muestra
-  // "Cargando…", y el estado real entra tras montar, de forma asíncrona,
-  // para que el HTML de hidratación coincida.
+  const pendiente = useRef<DatosTablero | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const modoLocal = useRef(false);
+
+  // Carga inicial: primero la nube; si la base de datos no está configurada
+  // o no responde, se usa la copia de este navegador como respaldo.
   useEffect(() => {
     let activo = true;
     (async () => {
-      const raw = await Promise.resolve().then(() => {
-        try {
-          return localStorage.getItem(STORAGE_KEY);
-        } catch {
-          return null;
+      let datos: Partial<DatosTablero> | null = null;
+      let enNube = false;
+      try {
+        const res = await fetch("/api/tablero");
+        if (res.ok) {
+          const cuerpo = (await res.json()) as { datos: DatosTablero | null };
+          datos = cuerpo.datos;
+          enNube = true;
         }
-      });
+      } catch {
+        // sin red o sin API: seguimos con el respaldo local
+      }
       if (!activo) return;
-      if (raw) {
-        try {
-          const d = JSON.parse(raw) as Partial<DatosTablero>;
-          setEbf(d.ebf ?? clone(SEED_EBF));
-          setMat(d.mat ?? clone(SEED_MAT));
-          setSnapshots(d.snapshots ?? []);
-          setJornadas(d.jornadas ?? []);
-        } catch {
-          seedInicial();
-        }
+
+      if (!enNube) {
+        modoLocal.current = true;
+        setSync("local");
+        datos = leerLocal();
+      }
+
+      if (datos) {
+        setEbf(datos.ebf ?? clone(SEED_EBF));
+        setMat(datos.mat ?? clone(SEED_MAT));
+        setSnapshots(datos.snapshots ?? []);
+        setJornadas(datos.jornadas ?? []);
       } else {
-        seedInicial();
+        // Primera vez: sembrar con el corte del informe del 2 de julio.
+        const semilla: DatosTablero = {
+          ebf: clone(SEED_EBF),
+          mat: clone(SEED_MAT),
+          snapshots: [clone(SNAPSHOT_SEED)],
+          jornadas: [],
+        };
+        setSnapshots(semilla.snapshots);
+        guardar(semilla);
       }
       setCargando(false);
     })();
-
-    function seedInicial() {
-      const s = [clone(SNAPSHOT_SEED)];
-      setSnapshots(s);
-      guardar({ ebf: clone(SEED_EBF), mat: clone(SEED_MAT), snapshots: s, jornadas: [] });
-    }
     return () => {
       activo = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ---------- Guardado ----------
+
   function guardar(datos: DatosTablero) {
+    escribirLocal(datos);
+    if (modoLocal.current) return;
+    pendiente.current = datos;
+    setSync("guardando");
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => void enviar(), 600);
+  }
+
+  async function enviar() {
+    const datos = pendiente.current;
+    if (!datos) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+      const cabeceras: Record<string, string> = { "Content-Type": "application/json" };
+      const clave = localStorage.getItem(CLAVE_KEY);
+      if (clave) cabeceras["x-tablero-clave"] = clave;
+      const res = await fetch("/api/tablero", {
+        method: "PUT",
+        headers: cabeceras,
+        body: JSON.stringify(datos),
+      });
+      if (res.status === 401) {
+        setSync("clave");
+        return;
+      }
+      if (res.status === 503) {
+        modoLocal.current = true;
+        setSync("local");
+        return;
+      }
+      if (!res.ok) {
+        setSync("error");
+        return;
+      }
+      pendiente.current = null;
+      setSync("guardado");
     } catch {
-      setAviso("No se pudo guardar. Intente de nuevo.");
-      setTimeout(() => setAviso(""), 4000);
+      setSync("error");
     }
+  }
+
+  function guardarClave() {
+    if (!claveInput.trim()) return;
+    try {
+      localStorage.setItem(CLAVE_KEY, claveInput.trim());
+    } catch {
+      // sin almacenamiento: la clave se usará solo en este envío
+    }
+    setClaveInput("");
+    setSync("guardando");
+    void enviar();
   }
 
   const persistir = (patch: Partial<DatosTablero>) =>
@@ -171,13 +256,16 @@ export default function TableroMFC() {
             <div className="text-[11px] uppercase tracking-[.18em] text-[#C9B36A]">
               Movimiento Familiar Cristiano · Arquidiócesis de San Pedro Sula
             </div>
-            <Link
-              href="/"
-              className="inline-flex shrink-0 items-center gap-1 text-xs text-white/50 transition-colors hover:text-white"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-              Volver al sitio
-            </Link>
+            <div className="flex shrink-0 items-center gap-4">
+              <ChipSync sync={sync} reintentar={() => void enviar()} />
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1 text-xs text-white/50 transition-colors hover:text-white"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+                Volver al sitio
+              </Link>
+            </div>
           </div>
           <h1 className="tablero-display mb-0.5 mt-1 text-3xl font-bold">
             Área I — El MFC y su Mística
@@ -223,6 +311,32 @@ export default function TableroMFC() {
         </div>
       </nav>
 
+      {sync === "clave" && (
+        <div className="mx-auto mt-3 max-w-[980px] px-5">
+          <div className="flex flex-wrap items-center gap-2.5 rounded-md border border-mfc-oro bg-[#EFE7CF] px-3 py-2 text-[13px]">
+            <KeyRound className="h-4 w-4 shrink-0 text-[#7a5f1c]" aria-hidden="true" />
+            <span>
+              Para guardar cambios en la nube, ingrese la clave de edición del equipo:
+            </span>
+            <input
+              type="password"
+              value={claveInput}
+              onChange={(e) => setClaveInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && guardarClave()}
+              className="rounded-md border border-[#cbd2e0] bg-white px-2.5 py-1 text-[13px]"
+              aria-label="Clave de edición"
+            />
+            <button
+              type="button"
+              onClick={guardarClave}
+              className="cursor-pointer rounded-md bg-mfc-azul px-3 py-1 text-xs font-semibold text-white"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+      )}
+
       {aviso && (
         <div className="mx-auto mt-3 max-w-[980px] px-5">
           <div
@@ -250,6 +364,56 @@ export default function TableroMFC() {
       </main>
     </div>
   );
+}
+
+function ChipSync({ sync, reintentar }: { sync: Sync; reintentar: () => void }) {
+  const base =
+    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold";
+  switch (sync) {
+    case "guardando":
+      return (
+        <span className={`${base} bg-white/10 text-white/70`} role="status">
+          <LoaderCircle className="h-3 w-3 animate-spin" aria-hidden="true" />
+          Guardando…
+        </span>
+      );
+    case "guardado":
+      return (
+        <span className={`${base} bg-white/10 text-white/70`} role="status">
+          <Cloud className="h-3 w-3" aria-hidden="true" />
+          Guardado en la nube
+        </span>
+      );
+    case "error":
+      return (
+        <button
+          type="button"
+          onClick={reintentar}
+          className={`${base} cursor-pointer bg-[#9B3B3B]/80 text-white`}
+        >
+          <TriangleAlert className="h-3 w-3" aria-hidden="true" />
+          Error al guardar — reintentar
+        </button>
+      );
+    case "clave":
+      return (
+        <span className={`${base} bg-mfc-oro/30 text-[#EFE7CF]`} role="status">
+          <KeyRound className="h-3 w-3" aria-hidden="true" />
+          Falta clave de edición
+        </span>
+      );
+    case "local":
+      return (
+        <span
+          className={`${base} bg-white/10 text-white/60`}
+          title="La base de datos no está configurada; los cambios solo se guardan en este dispositivo."
+          role="status"
+        >
+          <CloudOff className="h-3 w-3" aria-hidden="true" />
+          Solo en este dispositivo
+        </span>
+      );
+  }
 }
 
 function Indicador({
