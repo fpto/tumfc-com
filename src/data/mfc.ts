@@ -1,279 +1,131 @@
 // Datos de seguimiento del MFC — Área I: El MFC y su Mística
 // Arquidiócesis de San Pedro Sula · Equipo Coordinador Nacional 2026–2029
 //
-// Fuente: "Formato Provisional del Ciclo Básico de Formación",
-// fecha de actualización 2 de julio de 2026 (versiones sucesivas del informe).
-//
-// Para actualizar el tablero, edita este archivo:
-//  - Nuevo corte de membresía → agrega un elemento a SNAPSHOTS.
-//  - Jornadas conyugales → edita JORNADAS con las fechas reales.
+// Semilla: "Formato Provisional del Ciclo Básico de Formación",
+// corte del 2 de julio de 2026 (versión más completa del informe).
+// El tablero guarda las ediciones y cortes posteriores en localStorage.
 
 export const NIVELES = ["Nivel 0", "Nivel 1", "Nivel 2", "Nivel 3"] as const;
 
-// Rampa ordinal (un solo tono, claro→oscuro) para Nivel 0 → Nivel 3.
-// Validada con el verificador de paletas (monotonía de luminosidad,
-// contraste del extremo claro ≥ 2:1 sobre superficie blanca).
-export const COLOR_NIVEL = ["#ED8B95", "#E14F5E", "#CF152D", "#8F1021"] as const;
+// Rampa ordinal azul (claro→oscuro) para Nivel 0 → Nivel 3. El extremo claro
+// se oscureció respecto a la referencia (#C4D0E6 → #A2B7D8) para cumplir el
+// contraste mínimo de 2:1 sobre superficie blanca; validada con el
+// verificador de paletas.
+export const COLOR_NIVEL = ["#A2B7D8", "#8CA3CE", "#51709F", "#233A66"] as const;
+
+export const AZUL = "#233A66";
+export const ORO = "#A98428";
+export const PAPEL = "#F6F5F1";
+export const TINTA = "#1B2436";
 
 export type ParroquiaId =
   | "chamelecon"
   | "choloma"
   | "interparroquial"
-  | "puerto-cortes"
+  | "puertocortes"
   | "villanueva"
-  | "lopez-arellano"
-  | "santa-cruz";
+  | "lopezarellano"
+  | "santacruz";
 
 export interface Parroquia {
   id: ParroquiaId;
   nombre: string;
-  ciudad: string;
-  enDesarrollo?: boolean;
+  lugar: string;
 }
 
 export const PARROQUIAS: Parroquia[] = [
-  { id: "chamelecon", nombre: "Nuestra Señora de Suyapa", ciudad: "Chamelecón" },
-  { id: "choloma", nombre: "Nuestra Señora de Lourdes", ciudad: "Choloma" },
-  { id: "interparroquial", nombre: "Interparroquial", ciudad: "San Pedro Sula" },
-  { id: "puerto-cortes", nombre: "Sagrado Corazón de Jesús", ciudad: "Puerto Cortés" },
-  { id: "villanueva", nombre: "Nuestra Señora de la Visitación", ciudad: "Villanueva" },
-  { id: "lopez-arellano", nombre: "Nuestra Señora de Suyapa", ciudad: "López Arellano" },
-  { id: "santa-cruz", nombre: "La Santa Cruz", ciudad: "San Pedro Sula", enDesarrollo: true },
+  { id: "chamelecon", nombre: "Ntra. Sra. de Suyapa", lugar: "Chamelecón" },
+  { id: "choloma", nombre: "Ntra. Sra. de Lourdes", lugar: "Choloma" },
+  { id: "interparroquial", nombre: "Interparroquial", lugar: "San Pedro Sula" },
+  { id: "puertocortes", nombre: "Sagrado Corazón de Jesús", lugar: "Puerto Cortés" },
+  { id: "villanueva", nombre: "Ntra. Sra. de la Visitación", lugar: "Villanueva" },
+  { id: "lopezarellano", nombre: "Ntra. Sra. de Suyapa", lugar: "López Arellano" },
+  { id: "santacruz", nombre: "La Santa Cruz (en desarrollo)", lugar: "San Pedro Sula" },
 ];
-
-export type Metrica = "matrimonios" | "ebf";
-
-export const METRICA_LABEL: Record<Metrica, string> = {
-  matrimonios: "Matrimonios",
-  ebf: "Equipos (EBF)",
-};
 
 // Conteo por nivel [N0, N1, N2, N3]. null = dato aún no reportado.
-export type Conteo = [number | null, number | null, number | null, number | null];
+export type Conteo = (number | null)[];
+export type Reporte = Record<ParroquiaId, Conteo>;
 
-// null en la parroquia = la parroquia no reportó nada en ese corte.
-export type Reporte = Record<ParroquiaId, Conteo | null>;
-
-export interface Snapshot {
-  version: number;
-  label: string;
-  fecha: string; // ISO
-  ebf: Reporte;
-  matrimonios: Reporte;
-}
-
-const SIN_REPORTE: Reporte = {
-  chamelecon: null,
-  choloma: null,
-  interparroquial: null,
-  "puerto-cortes": null,
-  villanueva: null,
-  "lopez-arellano": null,
-  "santa-cruz": null,
+export const SEED_EBF: Reporte = {
+  chamelecon: [0, 0, 2, 2],
+  choloma: [1, 3, 0, 1],
+  interparroquial: [4, 7, 6, 3],
+  puertocortes: [0, 2, 1, 1],
+  villanueva: [0, 0, 0, 2],
+  lopezarellano: [0, 1, 2, 0],
+  santacruz: [3, 0, 0, 0],
 };
 
-export const SNAPSHOTS: Snapshot[] = [
-  {
-    version: 1,
-    label: "Corte 1",
-    fecha: "2026-07-02",
-    ebf: {
-      chamelecon: null,
-      choloma: [1, 3, 0, 0],
-      interparroquial: [4, 7, 6, 3],
-      "puerto-cortes": [0, 2, 1, 1],
-      villanueva: [0, 0, 0, 2],
-      "lopez-arellano": [0, 1, 2, 0],
-      "santa-cruz": null,
-    },
-    matrimonios: SIN_REPORTE,
-  },
-  {
-    version: 2,
-    label: "Corte 2",
-    fecha: "2026-07-02",
-    ebf: {
-      chamelecon: null,
-      choloma: [1, 3, 0, 0],
-      interparroquial: [4, 7, 6, 3],
-      "puerto-cortes": [0, 2, 1, 1],
-      villanueva: [0, 0, 0, 2],
-      "lopez-arellano": [0, 1, 2, 0],
-      "santa-cruz": [3, 0, 0, 0],
-    },
-    matrimonios: SIN_REPORTE,
-  },
-  {
-    version: 3,
-    label: "Corte 3",
-    fecha: "2026-07-02",
-    ebf: {
-      chamelecon: [0, 0, 2, 2],
-      choloma: [1, 3, 0, 0],
-      interparroquial: [4, 7, 6, 3],
-      "puerto-cortes": [0, 2, 1, 1],
-      villanueva: [0, 0, 0, 2],
-      "lopez-arellano": [0, 1, 2, 0],
-      "santa-cruz": [3, 0, 0, 0],
-    },
-    matrimonios: {
-      chamelecon: [0, 0, 8, 5],
-      choloma: null,
-      interparroquial: [19, 34, 24, 11],
-      "puerto-cortes": [0, 8, 4, 5],
-      villanueva: null,
-      "lopez-arellano": null,
-      "santa-cruz": [12, 0, 0, 0],
-    },
-  },
-  {
-    version: 4,
-    label: "Corte 4",
-    fecha: "2026-07-02",
-    ebf: {
-      chamelecon: [0, 0, 2, 2],
-      choloma: [1, 3, 0, 0],
-      interparroquial: [4, 7, 6, 3],
-      "puerto-cortes": [0, 2, 1, 1],
-      villanueva: [0, 0, 0, 2],
-      "lopez-arellano": [0, 1, 2, 0],
-      "santa-cruz": [3, 0, 0, 0],
-    },
-    matrimonios: {
-      chamelecon: [0, 0, 8, 5],
-      choloma: [19, 19, 0, 0],
-      interparroquial: [26, 34, 24, 11],
-      "puerto-cortes": [0, 8, 4, 5],
-      villanueva: null,
-      "lopez-arellano": [0, 3, 6, 0],
-      "santa-cruz": [12, 0, 0, 0],
-    },
-  },
-  {
-    version: 5,
-    label: "Corte 5",
-    fecha: "2026-07-02",
-    ebf: {
-      chamelecon: [0, 0, 2, 2],
-      choloma: [1, 3, 0, 1],
-      interparroquial: [4, 7, 6, 3],
-      "puerto-cortes": [0, 2, 1, 1],
-      villanueva: [0, 0, 0, 2],
-      "lopez-arellano": [0, 1, 2, 0],
-      "santa-cruz": [3, 0, 0, 0],
-    },
-    matrimonios: {
-      chamelecon: [0, 0, 8, 5],
-      choloma: [4, 19, 0, 3],
-      interparroquial: [26, 34, 24, 11],
-      "puerto-cortes": [0, 8, 4, 5],
-      villanueva: [0, 0, 0, null],
-      "lopez-arellano": [0, 3, 6, 0],
-      "santa-cruz": [12, 0, 0, 0],
-    },
-  },
-];
+export const SEED_MAT: Reporte = {
+  chamelecon: [0, 0, 8, 5],
+  choloma: [4, 19, 0, 3],
+  interparroquial: [26, 34, 24, 11],
+  puertocortes: [0, 8, 4, 5],
+  villanueva: [0, 0, 0, null],
+  lopezarellano: [0, 3, 6, 0],
+  santacruz: [12, 0, 0, 0],
+};
 
-export type EstadoJornada = "confirmada" | "por-confirmar" | "sin-programar";
-
-export interface Jornada {
-  parroquiaId: ParroquiaId;
-  fecha: string | null; // ISO, null si no hay fecha
-  lugar: string | null;
-  estado: EstadoJornada;
-  // Marca las entradas de muestra para que el tablero las señale
-  // visiblemente hasta que se reemplacen con fechas reales.
-  ejemplo?: boolean;
+export interface Snapshot {
+  fecha: string; // ISO
+  ebf: Reporte;
+  mat: Reporte;
 }
 
-export const JORNADAS: Jornada[] = [
-  {
-    parroquiaId: "interparroquial",
-    fecha: "2026-08-15",
-    lugar: "Casa de Retiros, San Pedro Sula",
-    estado: "confirmada",
-    ejemplo: true,
-  },
-  {
-    parroquiaId: "choloma",
-    fecha: "2026-09-12",
-    lugar: "Salón parroquial, Choloma",
-    estado: "por-confirmar",
-    ejemplo: true,
-  },
-  {
-    parroquiaId: "puerto-cortes",
-    fecha: "2026-10-03",
-    lugar: "Salón parroquial, Puerto Cortés",
-    estado: "por-confirmar",
-    ejemplo: true,
-  },
-  { parroquiaId: "chamelecon", fecha: null, lugar: null, estado: "sin-programar" },
-  { parroquiaId: "villanueva", fecha: null, lugar: null, estado: "sin-programar" },
-  { parroquiaId: "lopez-arellano", fecha: null, lugar: null, estado: "sin-programar" },
-  { parroquiaId: "santa-cruz", fecha: null, lugar: null, estado: "sin-programar" },
-];
+export const SNAPSHOT_SEED: Snapshot = {
+  fecha: "2026-07-02",
+  ebf: SEED_EBF,
+  mat: SEED_MAT,
+};
+
+export type EstadoJornada = "programada" | "realizada" | "cancelada";
+
+export const ESTADO_JORNADA: Record<EstadoJornada, { etiqueta: string; color: string }> = {
+  programada: { etiqueta: "Programada", color: ORO },
+  realizada: { etiqueta: "Realizada", color: "#3A6B4A" },
+  cancelada: { etiqueta: "Cancelada", color: "#9B3B3B" },
+};
+
+export interface Jornada {
+  id: string;
+  parroquia: ParroquiaId;
+  fecha: string; // ISO
+  notas: string;
+  estado: EstadoJornada;
+}
+
+export interface DatosTablero {
+  ebf: Reporte;
+  mat: Reporte;
+  snapshots: Snapshot[];
+  jornadas: Jornada[];
+}
+
+export const STORAGE_KEY = "mfc-tablero-v1";
 
 // ---------- Utilidades ----------
 
-export function totalConteo(conteo: Conteo | null): number | null {
-  if (conteo === null) return null;
-  const reportados = conteo.filter((v): v is number => v !== null);
-  if (reportados.length === 0) return null;
-  return reportados.reduce((a, b) => a + b, 0);
-}
+export const clone = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
 
-export function totalReporte(reporte: Reporte): number {
-  return PARROQUIAS.reduce((sum, p) => sum + (totalConteo(reporte[p.id]) ?? 0), 0);
-}
+export const suma = (arr: Conteo): number => arr.reduce<number>((a, b) => a + (b ?? 0), 0);
 
-export function totalesPorNivel(reporte: Reporte): number[] {
-  return NIVELES.map((_, nivel) =>
-    PARROQUIAS.reduce((sum, p) => sum + (reporte[p.id]?.[nivel] ?? 0), 0),
-  );
-}
+export const totalReporte = (r: Reporte): number =>
+  PARROQUIAS.reduce((acc, p) => acc + suma(r[p.id] ?? []), 0);
 
-export function serieHistorial(
-  metrica: Metrica,
-  parroquiaId: ParroquiaId | "todas",
-): (number | null)[] {
-  return SNAPSHOTS.map((s) => {
-    const reporte = s[metrica];
-    if (parroquiaId === "todas") {
-      const algunReporte = PARROQUIAS.some((p) => reporte[p.id] !== null);
-      return algunReporte ? totalReporte(reporte) : null;
-    }
-    return totalConteo(reporte[parroquiaId]);
-  });
-}
+export const hoyISO = (): string => new Date().toISOString().slice(0, 10);
 
-export function celdasSinReportar(snapshot: Snapshot): {
-  total: number;
-  detalle: { parroquiaId: ParroquiaId; metrica: Metrica; nivel: number | null }[];
-} {
-  const detalle: { parroquiaId: ParroquiaId; metrica: Metrica; nivel: number | null }[] = [];
-  for (const metrica of ["ebf", "matrimonios"] as Metrica[]) {
-    for (const p of PARROQUIAS) {
-      const conteo = snapshot[metrica][p.id];
-      if (conteo === null) {
-        detalle.push({ parroquiaId: p.id, metrica, nivel: null });
-      } else {
-        conteo.forEach((v, nivel) => {
-          if (v === null) detalle.push({ parroquiaId: p.id, metrica, nivel });
-        });
-      }
-    }
-  }
-  return { total: detalle.length, detalle };
-}
-
-export const SNAPSHOT_ACTUAL = SNAPSHOTS[SNAPSHOTS.length - 1];
-
-export function formatFecha(iso: string): string {
+export function fmtFecha(iso: string | null): string {
+  if (!iso) return "—";
   const [y, m, d] = iso.split("-").map(Number);
-  const meses = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio",
-    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
-  ];
-  return `${d} de ${meses[m - 1]} de ${y}`;
+  const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  return `${d} ${meses[m - 1]} ${y}`;
+}
+
+export function diasHasta(iso: string): number {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const [y, m, d] = iso.split("-").map(Number);
+  const f = new Date(y, m - 1, d);
+  return Math.round((f.getTime() - hoy.getTime()) / 86_400_000);
 }

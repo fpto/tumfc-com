@@ -12,6 +12,10 @@
   --color-mfc-gray: #B3B5B6;
   --color-mfc-gray-light: #F5F5F5;
   --color-mfc-gray-medium: #E5E5E5;
+  --color-mfc-azul: #233A66;
+  --color-mfc-oro: #A98428;
+  --color-mfc-papel: #F6F5F1;
+  --color-mfc-tinta: #1B2436;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -31,4 +35,41 @@ body {
 ::selection {
   background: #CF152D;
   color: #ffffff;
+}
+
+/* ---------- Tablero de Seguimiento (/dashboard) ---------- */
+
+.tablero-display {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+.tablero-cuerpo {
+  font-family: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+}
+
+.tablero-cuerpo input:focus,
+.tablero-cuerpo select:focus,
+.tablero-cuerpo button:focus-visible {
+  outline: 2px solid #A98428;
+  outline-offset: 1px;
+}
+
+.celda-num {
+  width: 3rem;
+  text-align: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 0;
+}
+
+.celda-num:hover {
+  border-color: #cbd2e0;
+  background: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tablero-cuerpo * {
+    transition: none !important;
+  }
 }
