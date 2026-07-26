@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import {
-  ORO,
+  CIAN,
   VERDE,
   ZONAS,
   fmtFecha,
@@ -93,7 +93,7 @@ export default function Historial({ snapshots, eliminarCorte }: Props) {
                 strokeWidth={2.5}
                 dot={{ r: 4 }}
               />
-              <Line type="monotone" dataKey="EBF" stroke={ORO} strokeWidth={2.5} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="EBF" stroke={CIAN} strokeWidth={2.5} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         )}

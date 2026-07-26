@@ -7,15 +7,44 @@
 
 export const NIVELES = ["Nivel 0", "Nivel 1", "Nivel 2", "Nivel 3"] as const;
 
-// Rampa ordinal verde (claro→oscuro) para Nivel 0 → Nivel 3, terminando en el
-// verde institucional del MFC. El extremo claro se mantiene por encima del
-// contraste mínimo de 2:1 sobre superficie blanca.
-export const COLOR_NIVEL = ["#8FBC9C", "#6BA87F", "#3B8153", "#196A39"] as const;
+// Paleta oficial del logo MFC Matrimonios, según el Manual de Uso de Marca
+// (Art. Nº 2 — Logo y Estandartes, Reglamentos del MFC de Honduras).
+export const PALETA_MFC = {
+  dorado: "#B89C11", // PMS 125 C
+  cafe: "#492F25", // PMS 470 C
+  rojo: "#CF152D", // PMS 186 C
+  verde: "#196A39", // PMS 349 C
+  negro: "#010101", // PMS Black C
+  rojoSecundario: "#C9151C", // PMS 186 C
+  amarillo: "#F7E602", // PMS 109 C
+  verdeLima: "#B5CC00", // PMS 376 C
+  terracota: "#B4383E", // PMS 202 C
+  gris: "#B3B5B6", // PMS Cool Gray 5 C
+  naranjaRojo: "#DC2F28", // PMS 1788 C
+  cian: "#0BB5D2", // PMS 312 C
+} as const;
 
-export const VERDE = "#196A39";
-export const ORO = "#B89C11";
+// Colores de marca por nivel del CBF (Nivel 0 → Nivel 3), culminando en el
+// verde institucional para el nivel más alto. Combinación verificada para
+// visión normal y deficiencias de color; el par rojo↔verde se apoya en los
+// separadores entre segmentos y las etiquetas directas de la barra.
+export const COLOR_NIVEL = [
+  PALETA_MFC.cian,
+  PALETA_MFC.dorado,
+  PALETA_MFC.rojo,
+  PALETA_MFC.verde,
+] as const;
+
+export const VERDE = PALETA_MFC.verde;
+export const ORO = PALETA_MFC.dorado;
+export const CIAN = PALETA_MFC.cian;
+export const ROJO = PALETA_MFC.rojo;
 export const PAPEL = "#F6F5F1";
 export const TINTA = "#16231B";
+
+// Tinta legible sobre cada color de nivel (oscura sobre cian/dorado,
+// blanca sobre rojo/verde).
+export const INK_NIVEL = [TINTA, TINTA, "#ffffff", "#ffffff"] as const;
 
 export type ParroquiaId =
   | "chamelecon"
@@ -111,8 +140,8 @@ export type EstadoJornada = "programada" | "realizada" | "cancelada";
 
 export const ESTADO_JORNADA: Record<EstadoJornada, { etiqueta: string; color: string }> = {
   programada: { etiqueta: "Programada", color: ORO },
-  realizada: { etiqueta: "Realizada", color: "#3A6B4A" },
-  cancelada: { etiqueta: "Cancelada", color: "#9B3B3B" },
+  realizada: { etiqueta: "Realizada", color: VERDE },
+  cancelada: { etiqueta: "Cancelada", color: ROJO },
 };
 
 export interface Jornada {

@@ -2,9 +2,9 @@
 
 import {
   COLOR_NIVEL,
+  INK_NIVEL,
   NIVELES,
   PARROQUIAS,
-  TINTA,
   ZONAS,
   parroquiasDeZona,
   suma,
@@ -63,23 +63,26 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
                       <div className="font-semibold">{p.lugar}</div>
                       <div className="text-[11px] text-[#8a93a3]">{p.nombre}</div>
                     </div>
-                    <div className="flex h-5 overflow-hidden rounded bg-[#eef0ec]">
-                      {vals.map((v, i) =>
-                        v ? (
+                    <div className="flex h-5 gap-[2px] overflow-hidden rounded bg-[#eef0ec]">
+                      {vals.map((v, i) => {
+                        if (!v) return null;
+                        const pct = total ? Math.round((v / total) * 100) : 0;
+                        const ancho = (v / maxMat) * 100;
+                        return (
                           <div
                             key={i}
-                            title={`${NIVELES[i]}: ${v}`}
-                            className="flex items-center justify-center text-[10.5px] font-semibold"
+                            title={`${NIVELES[i]}: ${pct}% (${v})`}
+                            className="flex items-center justify-center whitespace-nowrap rounded-[2px] text-[10.5px] font-semibold"
                             style={{
-                              width: `${(v / maxMat) * 100}%`,
+                              width: `${ancho}%`,
                               background: COLOR_NIVEL[i],
-                              color: i < 2 ? TINTA : "#fff",
+                              color: INK_NIVEL[i],
                             }}
                           >
-                            {v}
+                            {ancho >= 13 ? `${pct}% (${v})` : ancho >= 6 ? `${pct}%` : ""}
                           </div>
-                        ) : null,
-                      )}
+                        );
+                      })}
                     </div>
                     <div className="text-right font-bold text-mfc-green">{total}</div>
                   </div>
