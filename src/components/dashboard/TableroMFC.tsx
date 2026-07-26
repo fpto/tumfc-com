@@ -19,7 +19,7 @@ import {
   type Reporte,
   type Snapshot,
 } from "@/data/mfc";
-import LogoMFC from "@/components/LogoMFC";
+import Image from "next/image";
 import Panorama from "./Panorama";
 import Historial from "./Historial";
 import Jornadas from "./Jornadas";
@@ -261,7 +261,14 @@ export default function TableroMFC() {
             <ChipSync sync={sync} reintentar={() => void enviar()} />
           </div>
           <div className="mt-2 flex items-center gap-3.5">
-            <LogoMFC className="h-14 w-14 shrink-0 text-white" />
+            <Image
+              src="/mfc-logo-blanco.png"
+              alt="Logo del Movimiento Familiar Cristiano"
+              width={318}
+              height={499}
+              priority
+              className="h-24 w-auto shrink-0"
+            />
             <div>
               <h1 className="tablero-display mb-0.5 text-3xl font-bold">
                 Área I — El MFC y su Mística
