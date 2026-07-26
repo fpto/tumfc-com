@@ -14,8 +14,9 @@ import {
 import {
   ORO,
   VERDE,
-  PARROQUIAS,
+  ZONAS,
   fmtFecha,
+  parroquiasDeZona,
   suma,
   totalReporte,
   type ParroquiaId,
@@ -57,10 +58,14 @@ export default function Historial({ snapshots, eliminarCorte }: Props) {
             className="rounded-md border border-[#c3d4c8] bg-white px-2.5 py-1.5 text-[13px]"
           >
             <option value="total">Toda la arquidiócesis</option>
-            {PARROQUIAS.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.lugar} — {p.nombre}
-              </option>
+            {ZONAS.map((z) => (
+              <optgroup key={z.id} label={z.nombre}>
+                {parroquiasDeZona(z.id).map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.lugar} — {p.nombre}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>

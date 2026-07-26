@@ -5,6 +5,8 @@ import {
   NIVELES,
   PARROQUIAS,
   TINTA,
+  ZONAS,
+  parroquiasDeZona,
   suma,
   type ParroquiaId,
   type Reporte,
@@ -39,39 +41,50 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
         &ldquo;Guardar corte de hoy&rdquo; para registrar el estado en el historial.
       </p>
 
-      {/* Barras apiladas */}
+      {/* Barras apiladas, agrupadas por zona pastoral */}
       <div className="mb-6 rounded-[10px] border border-[#e2e2da] bg-white px-4.5 py-4">
-        {PARROQUIAS.map((p) => {
-          const vals = mat[p.id];
-          const total = suma(vals);
+        {ZONAS.map((z) => {
+          const parroquias = parroquiasDeZona(z.id);
+          if (parroquias.length === 0) return null;
           return (
-            <div
-              key={p.id}
-              className="grid items-center gap-2.5 border-b border-[#f0f0ea] py-[7px] sm:grid-cols-[170px_1fr_44px]"
-            >
-              <div className="text-[12.5px] leading-tight">
-                <div className="font-semibold">{p.lugar}</div>
-                <div className="text-[11px] text-[#8a93a3]">{p.nombre}</div>
+            <div key={z.id}>
+              <div className="mt-3 border-b border-[#e2e2da] pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#5b6472] first:mt-0">
+                {z.nombre}
               </div>
-              <div className="flex h-5 overflow-hidden rounded bg-[#eef0ec]">
-                {vals.map((v, i) =>
-                  v ? (
-                    <div
-                      key={i}
-                      title={`${NIVELES[i]}: ${v}`}
-                      className="flex items-center justify-center text-[10.5px] font-semibold"
-                      style={{
-                        width: `${(v / maxMat) * 100}%`,
-                        background: COLOR_NIVEL[i],
-                        color: i < 2 ? TINTA : "#fff",
-                      }}
-                    >
-                      {v}
+              {parroquias.map((p) => {
+                const vals = mat[p.id];
+                const total = suma(vals);
+                return (
+                  <div
+                    key={p.id}
+                    className="grid items-center gap-2.5 border-b border-[#f0f0ea] py-[7px] sm:grid-cols-[170px_1fr_44px]"
+                  >
+                    <div className="text-[12.5px] leading-tight">
+                      <div className="font-semibold">{p.lugar}</div>
+                      <div className="text-[11px] text-[#8a93a3]">{p.nombre}</div>
                     </div>
-                  ) : null,
-                )}
-              </div>
-              <div className="text-right font-bold text-mfc-green">{total}</div>
+                    <div className="flex h-5 overflow-hidden rounded bg-[#eef0ec]">
+                      {vals.map((v, i) =>
+                        v ? (
+                          <div
+                            key={i}
+                            title={`${NIVELES[i]}: ${v}`}
+                            className="flex items-center justify-center text-[10.5px] font-semibold"
+                            style={{
+                              width: `${(v / maxMat) * 100}%`,
+                              background: COLOR_NIVEL[i],
+                              color: i < 2 ? TINTA : "#fff",
+                            }}
+                          >
+                            {v}
+                          </div>
+                        ) : null,
+                      )}
+                    </div>
+                    <div className="text-right font-bold text-mfc-green">{total}</div>
+                  </div>
+                );
+              })}
             </div>
           );
         })}
@@ -135,29 +148,43 @@ function Tabla({
             </tr>
           </thead>
           <tbody>
-            {PARROQUIAS.map((p) => (
-              <tr key={p.id} className="border-t border-[#f0f0ea]">
-                <td className="px-3 py-[7px]">
-                  <span className="font-semibold">{p.lugar}</span>
-                  <span className="text-[11.5px] text-[#8a93a3]"> · {p.nombre}</span>
-                </td>
-                {[0, 1, 2, 3].map((n) => (
-                  <td key={n} className="p-1 text-center">
-                    <input
-                      className="celda-num tabular-nums"
-                      inputMode="numeric"
-                      value={datos[p.id][n] ?? ""}
-                      placeholder="—"
-                      onChange={(e) => setCelda(tipo, p.id, n, e.target.value)}
-                      aria-label={`${p.lugar} ${NIVELES[n]}`}
-                    />
+            {ZONAS.flatMap((z) => {
+              const parroquias = parroquiasDeZona(z.id);
+              if (parroquias.length === 0) return [];
+              return [
+                <tr key={z.id} className="border-t border-[#e2e2da] bg-[#FAF9F4]">
+                  <td
+                    colSpan={NIVELES.length + 2}
+                    className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[#5b6472]"
+                  >
+                    {z.nombre}
                   </td>
-                ))}
-                <td className="text-center font-bold tabular-nums text-mfc-green">
-                  {suma(datos[p.id])}
-                </td>
-              </tr>
-            ))}
+                </tr>,
+                ...parroquias.map((p) => (
+                  <tr key={p.id} className="border-t border-[#f0f0ea]">
+                    <td className="px-3 py-[7px]">
+                      <span className="font-semibold">{p.lugar}</span>
+                      <span className="text-[11.5px] text-[#8a93a3]"> · {p.nombre}</span>
+                    </td>
+                    {[0, 1, 2, 3].map((n) => (
+                      <td key={n} className="p-1 text-center">
+                        <input
+                          className="celda-num tabular-nums"
+                          inputMode="numeric"
+                          value={datos[p.id][n] ?? ""}
+                          placeholder="—"
+                          onChange={(e) => setCelda(tipo, p.id, n, e.target.value)}
+                          aria-label={`${p.lugar} ${NIVELES[n]}`}
+                        />
+                      </td>
+                    ))}
+                    <td className="text-center font-bold tabular-nums text-mfc-green">
+                      {suma(datos[p.id])}
+                    </td>
+                  </tr>
+                )),
+              ];
+            })}
             <tr className="border-t-2 border-[#d9d9cf] bg-[#FAF9F4] font-bold">
               <td className="px-3 py-2">Total arquidiócesis</td>
               {totalesNivel.map((t, i) => (

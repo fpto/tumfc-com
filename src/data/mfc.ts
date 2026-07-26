@@ -26,21 +26,46 @@ export type ParroquiaId =
   | "lopezarellano"
   | "santacruz";
 
+// Zonas pastorales de la Arquidiócesis de San Pedro Sula, según
+// "Estructuras y organismos de comunión" (4 zonas, 38 parroquias).
+export type ZonaId = "medalla" | "pablovi" | "sanpablo" | "subirana";
+
+export interface Zona {
+  id: ZonaId;
+  nombre: string;
+}
+
+export const ZONAS: Zona[] = [
+  { id: "medalla", nombre: "Zona Medalla Milagrosa" },
+  { id: "pablovi", nombre: "Zona Pablo VI" },
+  { id: "sanpablo", nombre: "Zona San Pablo" },
+  { id: "subirana", nombre: "Zona Subirana" },
+];
+
 export interface Parroquia {
   id: ParroquiaId;
   nombre: string;
   lugar: string;
+  zona: ZonaId;
 }
 
+// Ordenadas por zona pastoral (mismo orden que ZONAS).
 export const PARROQUIAS: Parroquia[] = [
-  { id: "chamelecon", nombre: "Ntra. Sra. de Suyapa", lugar: "Chamelecón" },
-  { id: "choloma", nombre: "Ntra. Sra. de Lourdes", lugar: "Choloma" },
-  { id: "interparroquial", nombre: "Interparroquial", lugar: "San Pedro Sula" },
-  { id: "puertocortes", nombre: "Sagrado Corazón de Jesús", lugar: "Puerto Cortés" },
-  { id: "villanueva", nombre: "Ntra. Sra. de la Visitación", lugar: "Villanueva" },
-  { id: "lopezarellano", nombre: "Ntra. Sra. de Suyapa", lugar: "López Arellano" },
-  { id: "santacruz", nombre: "La Santa Cruz (en desarrollo)", lugar: "San Pedro Sula" },
+  // Zona Medalla Milagrosa
+  { id: "choloma", nombre: "Ntra. Sra. de Lourdes", lugar: "Choloma", zona: "medalla" },
+  { id: "lopezarellano", nombre: "Ntra. Sra. de Suyapa", lugar: "López Arellano", zona: "medalla" },
+  { id: "puertocortes", nombre: "Sagrado Corazón de Jesús", lugar: "Puerto Cortés", zona: "medalla" },
+  // Zona Pablo VI
+  { id: "interparroquial", nombre: "Interparroquial", lugar: "San Pedro Sula", zona: "pablovi" },
+  { id: "santacruz", nombre: "La Santa Cruz (en desarrollo)", lugar: "San Pedro Sula", zona: "pablovi" },
+  // Zona San Pablo
+  { id: "chamelecon", nombre: "Ntra. Sra. de Suyapa", lugar: "Chamelecón", zona: "sanpablo" },
+  // Zona Subirana
+  { id: "villanueva", nombre: "Ntra. Sra. de la Visitación", lugar: "Villanueva", zona: "subirana" },
 ];
+
+export const parroquiasDeZona = (z: ZonaId): Parroquia[] =>
+  PARROQUIAS.filter((p) => p.zona === z);
 
 // Conteo por nivel [N0, N1, N2, N3]. null = dato aún no reportado.
 export type Conteo = (number | null)[];
