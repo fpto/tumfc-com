@@ -93,15 +93,8 @@ export interface Jornada {
   fecha: string; // ISO
   notas: string;
   estado: EstadoJornada;
-}
-
-// Registro de asistencia de matrimonios a una sesión del CBF.
-// niveles = asistentes por nivel [N0, N1, N2, N3]; null = ese nivel no sesionó.
-export interface Asistencia {
-  id: string;
-  parroquia: ParroquiaId;
-  fecha: string; // ISO
-  niveles: (number | null)[];
+  // Matrimonios que asistieron a la jornada; null = aún sin registrar.
+  asistentes?: number | null;
 }
 
 export interface DatosTablero {
@@ -109,7 +102,6 @@ export interface DatosTablero {
   mat: Reporte;
   snapshots: Snapshot[];
   jornadas: Jornada[];
-  asistencias: Asistencia[];
 }
 
 export const STORAGE_KEY = "mfc-tablero-v1";
