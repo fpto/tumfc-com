@@ -4,8 +4,10 @@ import { useState } from "react";
 import {
   ESTADO_JORNADA,
   PARROQUIAS,
+  ZONAS,
   diasHasta,
   fmtFecha,
+  parroquiasDeZona,
   type Jornada,
   type ParroquiaId,
 } from "@/data/mfc";
@@ -74,10 +76,14 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
               onChange={(e) => setForm({ ...form, parroquia: e.target.value as ParroquiaId })}
               className={`${inputEstilo} w-full`}
             >
-              {PARROQUIAS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.lugar} — {p.nombre}
-                </option>
+              {ZONAS.map((z) => (
+                <optgroup key={z.id} label={z.nombre}>
+                  {parroquiasDeZona(z.id).map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.lugar} — {p.nombre}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>
