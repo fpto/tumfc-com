@@ -16,7 +16,8 @@ function esDatosTablero(x: unknown): x is DatosTablero {
     typeof d.mat === "object" &&
     d.mat !== null &&
     Array.isArray(d.snapshots) &&
-    Array.isArray(d.jornadas)
+    Array.isArray(d.jornadas) &&
+    Array.isArray(d.asistencias)
   );
 }
 

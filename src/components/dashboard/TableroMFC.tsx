@@ -13,6 +13,7 @@ import {
   fmtFecha,
   hoyISO,
   totalReporte,
+  type Asistencia,
   type DatosTablero,
   type EstadoJornada,
   type Jornada,
@@ -21,10 +22,11 @@ import {
   type Snapshot,
 } from "@/data/mfc";
 import Panorama from "./Panorama";
+import AsistenciaTab from "./AsistenciaTab";
 import Historial from "./Historial";
 import Jornadas from "./Jornadas";
 
-type Tab = "panorama" | "historial" | "jornadas";
+type Tab = "panorama" | "asistencia" | "historial" | "jornadas";
 type Metrica = "ebf" | "mat";
 
 // Estado de sincronización con la nube:
@@ -36,6 +38,7 @@ const CLAVE_KEY = "mfc-tablero-clave";
 
 const TABS: [Tab, string][] = [
   ["panorama", "Membresía"],
+  ["asistencia", "Asistencia"],
   ["historial", "Historial"],
   ["jornadas", "Jornadas conyugales"],
 ];
@@ -64,6 +67,7 @@ export default function TableroMFC() {
   const [mat, setMat] = useState<Reporte>(() => clone(SEED_MAT));
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [jornadas, setJornadas] = useState<Jornada[]>([]);
+  const [asistencias, setAsistencias] = useState<Asistencia[]>([]);
   const [aviso, setAviso] = useState("");
   const [sync, setSync] = useState<Sync>("guardado");
   const [claveInput, setClaveInput] = useState("");
@@ -102,6 +106,7 @@ export default function TableroMFC() {
         setMat(datos.mat ?? clone(SEED_MAT));
         setSnapshots(datos.snapshots ?? []);
         setJornadas(datos.jornadas ?? []);
+        setAsistencias(datos.asistencias ?? []);
       } else {
         // Primera vez: sembrar con el corte del informe del 2 de julio.
         const semilla: DatosTablero = {
@@ -109,6 +114,7 @@ export default function TableroMFC() {
           mat: clone(SEED_MAT),
           snapshots: [clone(SNAPSHOT_SEED)],
           jornadas: [],
+          asistencias: [],
         };
         setSnapshots(semilla.snapshots);
         guardar(semilla);
@@ -177,7 +183,7 @@ export default function TableroMFC() {
   }
 
   const persistir = (patch: Partial<DatosTablero>) =>
-    guardar({ ebf, mat, snapshots, jornadas, ...patch });
+    guardar({ ebf, mat, snapshots, jornadas, asistencias, ...patch });
 
   // ---------- Ediciones de membresía ----------
   function setCelda(tipo: Metrica, pid: ParroquiaId, nivel: number, valor: string) {
@@ -226,6 +232,18 @@ export default function TableroMFC() {
     const nx = jornadas.filter((j) => j.id !== id);
     setJornadas(nx);
     persistir({ jornadas: nx });
+  }
+
+  // ---------- Asistencia ----------
+  function agregarAsistencia(a: Omit<Asistencia, "id">) {
+    const nx = [...asistencias, { ...a, id: Date.now().toString(36) }];
+    setAsistencias(nx);
+    persistir({ asistencias: nx });
+  }
+  function eliminarAsistencia(id: string) {
+    const nx = asistencias.filter((a) => a.id !== id);
+    setAsistencias(nx);
+    persistir({ asistencias: nx });
   }
 
   // ---------- Totales ----------
@@ -341,6 +359,14 @@ export default function TableroMFC() {
       <main className="mx-auto max-w-[980px] px-5 pb-16 pt-5">
         {tab === "panorama" && (
           <Panorama ebf={ebf} mat={mat} setCelda={setCelda} guardarCorte={guardarCorte} />
+        )}
+        {tab === "asistencia" && (
+          <AsistenciaTab
+            asistencias={asistencias}
+            mat={mat}
+            agregar={agregarAsistencia}
+            eliminar={eliminarAsistencia}
+          />
         )}
         {tab === "historial" && <Historial snapshots={snapshots} eliminarCorte={eliminarCorte} />}
         {tab === "jornadas" && (
