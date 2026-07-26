@@ -19,6 +19,7 @@ import {
   type Reporte,
   type Snapshot,
 } from "@/data/mfc";
+import LogoMFC from "@/components/LogoMFC";
 import Panorama from "./Panorama";
 import Historial from "./Historial";
 import Jornadas from "./Jornadas";
@@ -242,7 +243,7 @@ export default function TableroMFC() {
 
   if (cargando) {
     return (
-      <div className="tablero-display flex min-h-screen items-center justify-center bg-mfc-papel text-mfc-azul">
+      <div className="tablero-display flex min-h-screen items-center justify-center bg-mfc-papel text-mfc-green">
         Cargando tablero…
       </div>
     );
@@ -251,19 +252,24 @@ export default function TableroMFC() {
   return (
     <div className="tablero-cuerpo min-h-screen bg-mfc-papel text-mfc-tinta">
       {/* Encabezado */}
-      <header className="bg-mfc-azul px-5 pb-4 pt-5 text-white">
+      <header className="bg-mfc-green px-5 pb-4 pt-5 text-white">
         <div className="mx-auto max-w-[980px]">
           <div className="flex items-center justify-between gap-4">
-            <div className="text-[11px] uppercase tracking-[.18em] text-[#C9B36A]">
+            <div className="text-[11px] uppercase tracking-[.18em] text-[#EAD98F]">
               Movimiento Familiar Cristiano · Arquidiócesis de San Pedro Sula
             </div>
             <ChipSync sync={sync} reintentar={() => void enviar()} />
           </div>
-          <h1 className="tablero-display mb-0.5 mt-1 text-3xl font-bold">
-            Área I — El MFC y su Mística
-          </h1>
-          <div className="text-[13px] text-[#c7cfe0]">
-            Responsables: Fabricio y Estéfany Puerto · Ciclo Básico de Formación 2026–2029
+          <div className="mt-2 flex items-center gap-3.5">
+            <LogoMFC className="h-14 w-14 shrink-0 text-white" />
+            <div>
+              <h1 className="tablero-display mb-0.5 text-3xl font-bold">
+                Área I — El MFC y su Mística
+              </h1>
+              <div className="text-[13px] text-[#CFE3D5]">
+                Responsables: Fabricio y Estéfany Puerto · Ciclo Básico de Formación 2026–2029
+              </div>
+            </div>
           </div>
           <div className="mt-3.5 flex flex-wrap gap-6">
             <Indicador etiqueta="Matrimonios en CBF" valor={String(totMat)} />
@@ -293,7 +299,7 @@ export default function TableroMFC() {
               aria-current={tab === id ? "page" : undefined}
               className={`cursor-pointer border-b-2 px-1 py-2.5 text-xs font-semibold uppercase tracking-[.04em] transition-colors ${
                 tab === id
-                  ? "border-mfc-oro text-mfc-azul"
+                  ? "border-mfc-gold text-mfc-green"
                   : "border-transparent text-neutral-500 hover:text-neutral-700"
               }`}
             >
@@ -305,7 +311,7 @@ export default function TableroMFC() {
 
       {sync === "clave" && (
         <div className="mx-auto mt-3 max-w-[980px] px-5">
-          <div className="flex flex-wrap items-center gap-2.5 rounded-md border border-mfc-oro bg-[#EFE7CF] px-3 py-2 text-[13px]">
+          <div className="flex flex-wrap items-center gap-2.5 rounded-md border border-mfc-gold bg-[#EFE7CF] px-3 py-2 text-[13px]">
             <KeyRound className="h-4 w-4 shrink-0 text-[#7a5f1c]" aria-hidden="true" />
             <span>
               Para guardar cambios en la nube, ingrese la clave de edición del equipo:
@@ -315,13 +321,13 @@ export default function TableroMFC() {
               value={claveInput}
               onChange={(e) => setClaveInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && guardarClave()}
-              className="rounded-md border border-[#cbd2e0] bg-white px-2.5 py-1 text-[13px]"
+              className="rounded-md border border-[#c3d4c8] bg-white px-2.5 py-1 text-[13px]"
               aria-label="Clave de edición"
             />
             <button
               type="button"
               onClick={guardarClave}
-              className="cursor-pointer rounded-md bg-mfc-azul px-3 py-1 text-xs font-semibold text-white"
+              className="cursor-pointer rounded-md bg-mfc-green px-3 py-1 text-xs font-semibold text-white"
             >
               Guardar
             </button>
@@ -332,7 +338,7 @@ export default function TableroMFC() {
       {aviso && (
         <div className="mx-auto mt-3 max-w-[980px] px-5">
           <div
-            className="rounded-md border border-mfc-oro bg-[#EFE7CF] px-3 py-2 text-[13px]"
+            className="rounded-md border border-mfc-gold bg-[#EFE7CF] px-3 py-2 text-[13px]"
             role="status"
           >
             {aviso}
@@ -389,7 +395,7 @@ function ChipSync({ sync, reintentar }: { sync: Sync; reintentar: () => void }) 
       );
     case "clave":
       return (
-        <span className={`${base} bg-mfc-oro/30 text-[#EFE7CF]`} role="status">
+        <span className={`${base} bg-mfc-gold/30 text-[#EFE7CF]`} role="status">
           <KeyRound className="h-3 w-3" aria-hidden="true" />
           Falta clave de edición
         </span>
@@ -421,13 +427,13 @@ function Indicador({
 }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-[.12em] text-[#9fb0d0]">{etiqueta}</div>
+      <div className="text-[10px] uppercase tracking-[.12em] text-[#BFDCC8]">{etiqueta}</div>
       <div
         className={`${chico ? "tablero-cuerpo text-lg" : "tablero-display text-[28px]"} font-bold leading-tight text-white`}
       >
         {valor}
       </div>
-      {sub ? <div className="text-xs text-[#c7cfe0]">{sub}</div> : null}
+      {sub ? <div className="text-xs text-[#CFE3D5]">{sub}</div> : null}
     </div>
   );
 }

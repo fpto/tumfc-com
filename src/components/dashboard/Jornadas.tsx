@@ -18,7 +18,7 @@ interface Props {
 }
 
 const inputEstilo =
-  "rounded-md border border-[#cbd2e0] bg-white px-2.5 py-2 text-[13px] font-[inherit]";
+  "rounded-md border border-[#c3d4c8] bg-white px-2.5 py-2 text-[13px] font-[inherit]";
 
 const labelEstilo =
   "mb-1 block text-[11.5px] font-semibold uppercase tracking-[.06em] text-[#5b6472]";
@@ -47,7 +47,7 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
 
   return (
     <div>
-      <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-azul">
+      <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-green">
         Jornadas conyugales — pescas de nuevos matrimonios
       </h2>
       <p className="mt-0 text-[13px] text-[#5b6472]">
@@ -55,7 +55,7 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
         realizada registrando cuántos matrimonios asistieron.
       </p>
       {realizadas.length > 0 && (
-        <p className="mt-1 text-[13px] font-semibold text-mfc-azul">
+        <p className="mt-1 text-[13px] font-semibold text-mfc-green">
           {realizadas.length} {realizadas.length === 1 ? "jornada realizada" : "jornadas realizadas"} ·{" "}
           {alcanzados} matrimonios asistieron en total
         </p>
@@ -111,7 +111,7 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
             onClick={enviar}
             disabled={!form.fecha}
             className={`rounded-md px-4 py-2 text-[13px] font-semibold text-white ${
-              form.fecha ? "cursor-pointer bg-mfc-azul hover:opacity-90" : "bg-[#b5bccb]"
+              form.fecha ? "cursor-pointer bg-mfc-green hover:opacity-90" : "bg-[#b9c6bc]"
             }`}
           >
             Programar jornada
@@ -119,9 +119,9 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
         </div>
       </div>
 
-      <h3 className="tablero-display mb-2 text-[19px] font-bold text-mfc-azul">Próximas</h3>
+      <h3 className="tablero-display mb-2 text-[19px] font-bold text-mfc-green">Próximas</h3>
       {proximas.length === 0 ? (
-        <div className="mb-6 rounded-[10px] border border-dashed border-[#cbd2e0] bg-white p-4.5 text-[13px] text-[#8a93a3]">
+        <div className="mb-6 rounded-[10px] border border-dashed border-[#c3d4c8] bg-white p-4.5 text-[13px] text-[#8a93a3]">
           No hay jornadas programadas. Use el formulario de arriba para agregar la primera.
         </div>
       ) : (
@@ -134,7 +134,7 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
 
       {pasadas.length > 0 && (
         <>
-          <h3 className="tablero-display mb-2 text-[19px] font-bold text-mfc-azul">
+          <h3 className="tablero-display mb-2 text-[19px] font-bold text-mfc-green">
             Realizadas y anteriores
           </h3>
           <div className="grid gap-2.5">
@@ -206,7 +206,7 @@ function TarjetaJornada({
               <span className="ml-2 text-[12.5px] text-[#3d4656]">
                 {j.asistentes != null ? (
                   <>
-                    <strong className="tabular-nums text-mfc-azul">{j.asistentes}</strong>{" "}
+                    <strong className="tabular-nums text-mfc-green">{j.asistentes}</strong>{" "}
                     matrimonios asistieron
                   </>
                 ) : (
@@ -275,7 +275,7 @@ function TarjetaJornada({
           <button
             type="button"
             onClick={guardarAsistencia}
-            className="cursor-pointer rounded-md bg-mfc-azul px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+            className="cursor-pointer rounded-md bg-mfc-green px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
           >
             Guardar
           </button>

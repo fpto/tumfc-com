@@ -12,8 +12,8 @@ import {
   YAxis,
 } from "recharts";
 import {
-  AZUL,
   ORO,
+  VERDE,
   PARROQUIAS,
   fmtFecha,
   suma,
@@ -40,7 +40,7 @@ export default function Historial({ snapshots, eliminarCorte }: Props) {
 
   return (
     <div>
-      <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-azul">
+      <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-green">
         Evolución de la membresía
       </h2>
       <p className="mt-0 text-[13px] text-[#5b6472]">
@@ -54,7 +54,7 @@ export default function Historial({ snapshots, eliminarCorte }: Props) {
           <select
             value={serie}
             onChange={(e) => setSerie(e.target.value as Serie)}
-            className="rounded-md border border-[#cbd2e0] bg-white px-2.5 py-1.5 text-[13px]"
+            className="rounded-md border border-[#c3d4c8] bg-white px-2.5 py-1.5 text-[13px]"
           >
             <option value="total">Toda la arquidiócesis</option>
             {PARROQUIAS.map((p) => (
@@ -84,7 +84,7 @@ export default function Historial({ snapshots, eliminarCorte }: Props) {
               <Line
                 type="monotone"
                 dataKey="Matrimonios"
-                stroke={AZUL}
+                stroke={VERDE}
                 strokeWidth={2.5}
                 dot={{ r: 4 }}
               />
@@ -94,7 +94,7 @@ export default function Historial({ snapshots, eliminarCorte }: Props) {
         )}
       </div>
 
-      <h3 className="tablero-display mb-2 mt-5 text-[19px] font-bold text-mfc-azul">
+      <h3 className="tablero-display mb-2 mt-5 text-[19px] font-bold text-mfc-green">
         Cortes registrados
       </h3>
       <div className="rounded-[10px] border border-[#e2e2da] bg-white">

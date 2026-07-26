@@ -23,13 +23,13 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-azul">
+        <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-green">
           Matrimonios por parroquia y nivel
         </h2>
         <button
           type="button"
           onClick={guardarCorte}
-          className="cursor-pointer rounded-md bg-mfc-azul px-3.5 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+          className="cursor-pointer rounded-md bg-mfc-green px-3.5 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
         >
           Guardar corte de hoy
         </button>
@@ -71,7 +71,7 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
                   ) : null,
                 )}
               </div>
-              <div className="text-right font-bold text-mfc-azul">{total}</div>
+              <div className="text-right font-bold text-mfc-green">{total}</div>
             </div>
           );
         })}
@@ -120,7 +120,7 @@ function Tabla({
 
   return (
     <div className="mb-6">
-      <h3 className="tablero-display mb-2 text-xl font-bold text-mfc-azul">{titulo}</h3>
+      <h3 className="tablero-display mb-2 text-xl font-bold text-mfc-green">{titulo}</h3>
       <div className="overflow-x-auto rounded-[10px] border border-[#e2e2da] bg-white">
         <table className="w-full border-collapse text-[13px]">
           <thead>
@@ -153,7 +153,7 @@ function Tabla({
                     />
                   </td>
                 ))}
-                <td className="text-center font-bold tabular-nums text-mfc-azul">
+                <td className="text-center font-bold tabular-nums text-mfc-green">
                   {suma(datos[p.id])}
                 </td>
               </tr>
@@ -165,7 +165,7 @@ function Tabla({
                   {t}
                 </td>
               ))}
-              <td className="text-center tabular-nums text-mfc-azul">{suma(totalesNivel)}</td>
+              <td className="text-center tabular-nums text-mfc-green">{suma(totalesNivel)}</td>
             </tr>
           </tbody>
         </table>

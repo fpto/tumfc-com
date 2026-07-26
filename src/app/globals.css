@@ -12,10 +12,8 @@
   --color-mfc-gray: #B3B5B6;
   --color-mfc-gray-light: #F5F5F5;
   --color-mfc-gray-medium: #E5E5E5;
-  --color-mfc-azul: #233A66;
-  --color-mfc-oro: #A98428;
   --color-mfc-papel: #F6F5F1;
-  --color-mfc-tinta: #1B2436;
+  --color-mfc-tinta: #16231B;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -33,7 +31,7 @@ body {
 }
 
 ::selection {
-  background: #233A66;
+  background: #196A39;
   color: #ffffff;
 }
 
@@ -50,7 +48,7 @@ body {
 .tablero-cuerpo input:focus,
 .tablero-cuerpo select:focus,
 .tablero-cuerpo button:focus-visible {
-  outline: 2px solid #A98428;
+  outline: 2px solid #B89C11;
   outline-offset: 1px;
 }
 
@@ -64,7 +62,7 @@ body {
 }
 
 .celda-num:hover {
-  border-color: #cbd2e0;
+  border-color: #c3d4c8;
   background: #fff;
 }
 
