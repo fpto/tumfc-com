@@ -20,8 +20,6 @@ interface Props {
 }
 
 export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
-  const maxMat = Math.max(...PARROQUIAS.map((p) => suma(mat[p.id])), 1);
-
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -66,20 +64,22 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
                     <div className="flex h-5 gap-[2px] overflow-hidden rounded bg-[#eef0ec]">
                       {vals.map((v, i) => {
                         if (!v) return null;
-                        const pct = total ? Math.round((v / total) * 100) : 0;
-                        const ancho = (v / maxMat) * 100;
+                        // Barra al 100%: cada segmento es la proporción del
+                        // nivel dentro del total de la parroquia.
+                        const pct = total ? (v / total) * 100 : 0;
+                        const etiqueta = Math.round(pct);
                         return (
                           <div
                             key={i}
-                            title={`${NIVELES[i]}: ${pct}% (${v})`}
+                            title={`${NIVELES[i]}: ${etiqueta}% (${v})`}
                             className="flex items-center justify-center whitespace-nowrap rounded-[2px] text-[10.5px] font-semibold"
                             style={{
-                              width: `${ancho}%`,
+                              flex: `${pct} 1 0%`,
                               background: COLOR_NIVEL[i],
                               color: INK_NIVEL[i],
                             }}
                           >
-                            {ancho >= 13 ? `${pct}% (${v})` : ancho >= 6 ? `${pct}%` : ""}
+                            {pct >= 10 ? `${etiqueta}% (${v})` : pct >= 5 ? `${etiqueta}%` : ""}
                           </div>
                         );
                       })}
