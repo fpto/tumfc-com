@@ -28,7 +28,9 @@ export type ParroquiaId =
 
 // Zonas pastorales de la Arquidiócesis de San Pedro Sula, según
 // "Estructuras y organismos de comunión" (4 zonas, 38 parroquias).
-export type ZonaId = "medalla" | "pablovi" | "sanpablo" | "subirana";
+// "Interzonal" agrupa las obras que no están amarradas a una zona
+// específica, como el Interparroquial de San Pedro Sula.
+export type ZonaId = "medalla" | "pablovi" | "sanpablo" | "subirana" | "interzonal";
 
 export interface Zona {
   id: ZonaId;
@@ -40,6 +42,7 @@ export const ZONAS: Zona[] = [
   { id: "pablovi", nombre: "Zona Pablo VI" },
   { id: "sanpablo", nombre: "Zona San Pablo" },
   { id: "subirana", nombre: "Zona Subirana" },
+  { id: "interzonal", nombre: "Interzonal" },
 ];
 
 export interface Parroquia {
@@ -56,12 +59,13 @@ export const PARROQUIAS: Parroquia[] = [
   { id: "lopezarellano", nombre: "Ntra. Sra. de Suyapa", lugar: "López Arellano", zona: "medalla" },
   { id: "puertocortes", nombre: "Sagrado Corazón de Jesús", lugar: "Puerto Cortés", zona: "medalla" },
   // Zona Pablo VI
-  { id: "interparroquial", nombre: "Interparroquial", lugar: "San Pedro Sula", zona: "pablovi" },
   { id: "santacruz", nombre: "La Santa Cruz (en desarrollo)", lugar: "San Pedro Sula", zona: "pablovi" },
   // Zona San Pablo
   { id: "chamelecon", nombre: "Ntra. Sra. de Suyapa", lugar: "Chamelecón", zona: "sanpablo" },
   // Zona Subirana
   { id: "villanueva", nombre: "Ntra. Sra. de la Visitación", lugar: "Villanueva", zona: "subirana" },
+  // Interzonal
+  { id: "interparroquial", nombre: "Interparroquial", lugar: "San Pedro Sula", zona: "interzonal" },
 ];
 
 export const parroquiasDeZona = (z: ZonaId): Parroquia[] =>
