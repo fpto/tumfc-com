@@ -7,16 +7,15 @@
 
 export const NIVELES = ["Nivel 0", "Nivel 1", "Nivel 2", "Nivel 3"] as const;
 
-// Rampa ordinal azul (claro→oscuro) para Nivel 0 → Nivel 3. El extremo claro
-// se oscureció respecto a la referencia (#C4D0E6 → #A2B7D8) para cumplir el
-// contraste mínimo de 2:1 sobre superficie blanca; validada con el
-// verificador de paletas.
-export const COLOR_NIVEL = ["#A2B7D8", "#8CA3CE", "#51709F", "#233A66"] as const;
+// Rampa ordinal verde (claro→oscuro) para Nivel 0 → Nivel 3, terminando en el
+// verde institucional del MFC. El extremo claro se mantiene por encima del
+// contraste mínimo de 2:1 sobre superficie blanca.
+export const COLOR_NIVEL = ["#8FBC9C", "#6BA87F", "#3B8153", "#196A39"] as const;
 
-export const AZUL = "#233A66";
-export const ORO = "#A98428";
+export const VERDE = "#196A39";
+export const ORO = "#B89C11";
 export const PAPEL = "#F6F5F1";
-export const TINTA = "#1B2436";
+export const TINTA = "#16231B";
 
 export type ParroquiaId =
   | "chamelecon"
