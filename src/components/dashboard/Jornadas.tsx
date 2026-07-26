@@ -6,7 +6,6 @@ import {
   PARROQUIAS,
   diasHasta,
   fmtFecha,
-  type EstadoJornada,
   type Jornada,
   type ParroquiaId,
 } from "@/data/mfc";
@@ -14,7 +13,7 @@ import {
 interface Props {
   jornadas: Jornada[];
   agregar: (j: Omit<Jornada, "id">) => void;
-  actualizar: (id: string, patch: { estado: EstadoJornada }) => void;
+  actualizar: (id: string, patch: Partial<Pick<Jornada, "estado" | "asistentes">>) => void;
   eliminar: (id: string) => void;
 }
 
@@ -33,7 +32,7 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
 
   function enviar() {
     if (!form.fecha) return;
-    agregar({ ...form, estado: "programada" });
+    agregar({ ...form, estado: "programada", asistentes: null });
     setForm({ parroquia: PARROQUIAS[0].id, fecha: "", notas: "" });
   }
 
@@ -43,17 +42,27 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
     .filter((j) => !(j.estado === "programada" && diasHasta(j.fecha) >= 0))
     .reverse();
 
+  const realizadas = jornadas.filter((j) => j.estado === "realizada");
+  const alcanzados = realizadas.reduce((acc, j) => acc + (j.asistentes ?? 0), 0);
+
   return (
     <div>
       <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-azul">
         Jornadas conyugales — pescas de nuevos matrimonios
       </h2>
       <p className="mt-0 text-[13px] text-[#5b6472]">
-        Programe aquí las jornadas por parroquia y márquelas como realizadas al concluir.
+        Programe aquí las jornadas por parroquia y, al concluir cada una, márquela como
+        realizada registrando cuántos matrimonios asistieron.
       </p>
+      {realizadas.length > 0 && (
+        <p className="mt-1 text-[13px] font-semibold text-mfc-azul">
+          {realizadas.length} {realizadas.length === 1 ? "jornada realizada" : "jornadas realizadas"} ·{" "}
+          {alcanzados} matrimonios asistieron en total
+        </p>
+      )}
 
       {/* Formulario */}
-      <div className="mb-6 rounded-[10px] border border-[#e2e2da] bg-white p-4">
+      <div className="mb-6 mt-3 rounded-[10px] border border-[#e2e2da] bg-white p-4">
         <div className="flex flex-wrap items-end gap-2.5">
           <div className="min-w-[220px] flex-1">
             <label className={labelEstilo} htmlFor="jornada-parroquia">
@@ -154,56 +163,131 @@ function TarjetaJornada({
   const dias = diasHasta(j.fecha);
   const est = ESTADO_JORNADA[j.estado] ?? ESTADO_JORNADA.programada;
 
+  // Mini-formulario de asistencia: se abre al marcar como realizada
+  // o al corregir la asistencia de una jornada ya realizada.
+  const [pidiendoAsistencia, setPidiendoAsistencia] = useState(false);
+  const [asistentes, setAsistentes] = useState("");
+
+  function abrirAsistencia() {
+    setAsistentes(j.asistentes != null ? String(j.asistentes) : "");
+    setPidiendoAsistencia(true);
+  }
+
+  function guardarAsistencia() {
+    actualizar(j.id, {
+      estado: "realizada",
+      asistentes: asistentes === "" ? null : Math.max(0, parseInt(asistentes, 10) || 0),
+    });
+    setPidiendoAsistencia(false);
+  }
+
   return (
     <div
-      className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-[#e2e2da] bg-white px-3.5 py-3"
+      className="rounded-[10px] border border-[#e2e2da] bg-white px-3.5 py-3"
       style={{ borderLeft: `4px solid ${est.color}` }}
     >
-      <div>
-        <div className="text-sm font-bold">
-          {p?.lugar}{" "}
-          <span className="text-[12.5px] font-normal text-[#8a93a3]">· {p?.nombre}</span>
-        </div>
-        <div className="mt-0.5 text-[13px] text-[#3d4656]">
-          {fmtFecha(j.fecha)}
-          {proxima && dias >= 0 && (
-            <span className="ml-2 rounded-full bg-[#EFE7CF] px-2.5 py-0.5 text-[11.5px] font-semibold text-[#7a5f1c]">
-              {dias === 0 ? "Hoy" : dias === 1 ? "Mañana" : `En ${dias} días`}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-sm font-bold">
+            {p?.lugar}{" "}
+            <span className="text-[12.5px] font-normal text-[#8a93a3]">· {p?.nombre}</span>
+          </div>
+          <div className="mt-0.5 text-[13px] text-[#3d4656]">
+            {fmtFecha(j.fecha)}
+            {proxima && dias >= 0 && (
+              <span className="ml-2 rounded-full bg-[#EFE7CF] px-2.5 py-0.5 text-[11.5px] font-semibold text-[#7a5f1c]">
+                {dias === 0 ? "Hoy" : dias === 1 ? "Mañana" : `En ${dias} días`}
+              </span>
+            )}
+            <span className="ml-2 text-xs font-semibold" style={{ color: est.color }}>
+              {est.etiqueta}
             </span>
-          )}
-          <span className="ml-2 text-xs font-semibold" style={{ color: est.color }}>
-            {est.etiqueta}
-          </span>
+            {j.estado === "realizada" && (
+              <span className="ml-2 text-[12.5px] text-[#3d4656]">
+                {j.asistentes != null ? (
+                  <>
+                    <strong className="tabular-nums text-mfc-azul">{j.asistentes}</strong>{" "}
+                    matrimonios asistieron
+                  </>
+                ) : (
+                  <em className="text-[#8a93a3]">asistencia sin registrar</em>
+                )}
+              </span>
+            )}
+          </div>
+          {j.notas && <div className="mt-1 text-[12.5px] text-[#5b6472]">{j.notas}</div>}
         </div>
-        {j.notas && <div className="mt-1 text-[12.5px] text-[#5b6472]">{j.notas}</div>}
-      </div>
-      <div className="flex gap-2">
-        {j.estado === "programada" && (
+        <div className="flex flex-wrap gap-2">
+          {j.estado === "programada" && !pidiendoAsistencia && (
+            <button
+              type="button"
+              onClick={abrirAsistencia}
+              className="cursor-pointer rounded-md border border-[#3A6B4A] px-2.5 py-1 text-xs font-semibold text-[#3A6B4A] transition-colors hover:bg-[#F2F7F3]"
+            >
+              Marcar realizada
+            </button>
+          )}
+          {j.estado === "realizada" && !pidiendoAsistencia && (
+            <button
+              type="button"
+              onClick={abrirAsistencia}
+              className="cursor-pointer rounded-md border border-[#d9d9cf] px-2.5 py-1 text-xs text-[#5b6472] transition-colors hover:bg-neutral-50"
+            >
+              {j.asistentes != null ? "Corregir asistencia" : "Registrar asistencia"}
+            </button>
+          )}
+          {j.estado === "programada" && (
+            <button
+              type="button"
+              onClick={() => actualizar(j.id, { estado: "cancelada" })}
+              className="cursor-pointer rounded-md border border-[#d9d9cf] px-2.5 py-1 text-xs text-[#9B3B3B] transition-colors hover:bg-[#FAF4F4]"
+            >
+              Cancelar
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => actualizar(j.id, { estado: "realizada" })}
-            className="cursor-pointer rounded-md border border-[#3A6B4A] px-2.5 py-1 text-xs font-semibold text-[#3A6B4A] transition-colors hover:bg-[#F2F7F3]"
+            onClick={() => eliminar(j.id)}
+            className="cursor-pointer rounded-md border border-[#d9d9cf] px-2.5 py-1 text-xs text-[#8a93a3] transition-colors hover:bg-neutral-50"
           >
-            Marcar realizada
+            Eliminar
           </button>
-        )}
-        {j.estado === "programada" && (
+        </div>
+      </div>
+
+      {pidiendoAsistencia && (
+        <div className="mt-2.5 flex flex-wrap items-center gap-2.5 rounded-md bg-[#F6F5F1] px-3 py-2.5">
+          <label
+            className="text-[12.5px] font-semibold text-[#3d4656]"
+            htmlFor={`asistentes-${j.id}`}
+          >
+            ¿Cuántos matrimonios asistieron?
+          </label>
+          <input
+            id={`asistentes-${j.id}`}
+            inputMode="numeric"
+            value={asistentes}
+            onChange={(e) => setAsistentes(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && guardarAsistencia()}
+            className={`${inputEstilo} w-20 text-center tabular-nums`}
+            placeholder="0"
+          />
           <button
             type="button"
-            onClick={() => actualizar(j.id, { estado: "cancelada" })}
-            className="cursor-pointer rounded-md border border-[#d9d9cf] px-2.5 py-1 text-xs text-[#9B3B3B] transition-colors hover:bg-[#FAF4F4]"
+            onClick={guardarAsistencia}
+            className="cursor-pointer rounded-md bg-mfc-azul px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+          >
+            Guardar
+          </button>
+          <button
+            type="button"
+            onClick={() => setPidiendoAsistencia(false)}
+            className="cursor-pointer rounded-md border border-[#d9d9cf] px-3 py-1.5 text-xs text-[#5b6472] hover:bg-neutral-50"
           >
             Cancelar
           </button>
-        )}
-        <button
-          type="button"
-          onClick={() => eliminar(j.id)}
-          className="cursor-pointer rounded-md border border-[#d9d9cf] px-2.5 py-1 text-xs text-[#8a93a3] transition-colors hover:bg-neutral-50"
-        >
-          Eliminar
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
