@@ -44,6 +44,9 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
     .filter((j) => !(j.estado === "programada" && diasHasta(j.fecha) >= 0))
     .reverse();
 
+  const proximasPorParroquia = agruparPorParroquia(proximas);
+  const pasadasPorParroquia = agruparPorParroquia(pasadas);
+
   const realizadas = jornadas.filter((j) => j.estado === "realizada");
   const alcanzados = realizadas.reduce((acc, j) => acc + (j.asistentes ?? 0), 0);
 
@@ -131,9 +134,19 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
           No hay jornadas programadas. Use el formulario de arriba para agregar la primera.
         </div>
       ) : (
-        <div className="mb-6 grid gap-2.5">
-          {proximas.map((j) => (
-            <TarjetaJornada key={j.id} j={j} actualizar={actualizar} eliminar={eliminar} proxima />
+        <div className="mb-6 grid gap-4">
+          {proximasPorParroquia.map(([pid, lista]) => (
+            <GrupoParroquia key={pid} parroquia={pid}>
+              {lista.map((j) => (
+                <TarjetaJornada
+                  key={j.id}
+                  j={j}
+                  actualizar={actualizar}
+                  eliminar={eliminar}
+                  proxima
+                />
+              ))}
+            </GrupoParroquia>
           ))}
         </div>
       )}
@@ -143,14 +156,49 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
           <h3 className="tablero-display mb-2 text-[19px] font-bold text-mfc-green">
             Realizadas y anteriores
           </h3>
-          <div className="grid gap-2.5">
-            {pasadas.map((j) => (
-              <TarjetaJornada key={j.id} j={j} actualizar={actualizar} eliminar={eliminar} />
+          <div className="grid gap-4">
+            {pasadasPorParroquia.map(([pid, lista]) => (
+              <GrupoParroquia key={pid} parroquia={pid}>
+                {lista.map((j) => (
+                  <TarjetaJornada key={j.id} j={j} actualizar={actualizar} eliminar={eliminar} />
+                ))}
+              </GrupoParroquia>
             ))}
           </div>
         </>
       )}
     </div>
+  );
+}
+
+// Agrupa preservando el orden de la lista: la parroquia cuya jornada aparece
+// primero (más próxima o más reciente, según la sección) encabeza el listado.
+function agruparPorParroquia(lista: Jornada[]): [ParroquiaId, Jornada[]][] {
+  const grupos = new Map<ParroquiaId, Jornada[]>();
+  for (const j of lista) {
+    const grupo = grupos.get(j.parroquia);
+    if (grupo) grupo.push(j);
+    else grupos.set(j.parroquia, [j]);
+  }
+  return [...grupos.entries()];
+}
+
+function GrupoParroquia({
+  parroquia,
+  children,
+}: {
+  parroquia: ParroquiaId;
+  children: React.ReactNode;
+}) {
+  const p = PARROQUIAS.find((x) => x.id === parroquia);
+  return (
+    <section>
+      <h4 className="mb-1.5 text-sm font-bold text-[#16231B]">
+        {p?.lugar}{" "}
+        <span className="text-[12.5px] font-normal text-[#8a93a3]">· {p?.nombre}</span>
+      </h4>
+      <div className="grid gap-2.5">{children}</div>
+    </section>
   );
 }
 
@@ -165,7 +213,6 @@ function TarjetaJornada({
   eliminar: Props["eliminar"];
   proxima?: boolean;
 }) {
-  const p = PARROQUIAS.find((x) => x.id === j.parroquia);
   const dias = diasHasta(j.fecha);
   const est = ESTADO_JORNADA[j.estado] ?? ESTADO_JORNADA.programada;
 
@@ -194,12 +241,8 @@ function TarjetaJornada({
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-sm font-bold">
-            {p?.lugar}{" "}
-            <span className="text-[12.5px] font-normal text-[#8a93a3]">· {p?.nombre}</span>
-          </div>
-          <div className="mt-0.5 text-[13px] text-[#3d4656]">
-            {fmtFecha(j.fecha)}
+          <div className="text-[13px] text-[#3d4656]">
+            <span className="text-sm font-bold text-[#16231B]">{fmtFecha(j.fecha)}</span>
             {proxima && dias >= 0 && (
               <span className="ml-2 rounded-full bg-[#EFE7CF] px-2.5 py-0.5 text-[11.5px] font-semibold text-[#7a5f1c]">
                 {dias === 0 ? "Hoy" : dias === 1 ? "Mañana" : `En ${dias} días`}
