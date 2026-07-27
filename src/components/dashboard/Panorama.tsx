@@ -8,6 +8,7 @@ import {
   ZONAS,
   parroquiasDeZona,
   suma,
+  type Conteo,
   type ParroquiaId,
   type Reporte,
 } from "@/data/mfc";
@@ -19,7 +20,45 @@ interface Props {
   guardarCorte: () => void;
 }
 
+// Barra apilada al 100%: cada segmento es la proporción del nivel dentro
+// del total, con etiqueta "% (n)" cuando el segmento tiene espacio.
+function BarraNiveles({ vals, alta = false }: { vals: Conteo; alta?: boolean }) {
+  const total = suma(vals);
+  return (
+    <div
+      className={`flex gap-[2px] overflow-hidden rounded bg-[#eef0ec] ${
+        alta ? "h-7 text-[11.5px]" : "h-5 text-[10.5px]"
+      }`}
+    >
+      {vals.map((v, i) => {
+        if (!v) return null;
+        const pct = total ? (v / total) * 100 : 0;
+        const etiqueta = Math.round(pct);
+        return (
+          <div
+            key={i}
+            title={`${NIVELES[i]}: ${etiqueta}% (${v})`}
+            className="flex items-center justify-center whitespace-nowrap rounded-[2px] font-semibold"
+            style={{
+              flex: `${pct} 1 0%`,
+              background: COLOR_NIVEL[i],
+              color: INK_NIVEL[i],
+            }}
+          >
+            {pct >= 10 ? `${etiqueta}% (${v})` : pct >= 5 ? `${etiqueta}%` : ""}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
+  // Suma de cada nivel en toda la arquidiócesis, para la barra resumen.
+  const totalesNivel = [0, 1, 2, 3].map((n) =>
+    suma(PARROQUIAS.map((p) => mat[p.id][n] ?? 0)),
+  );
+
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -41,12 +80,24 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
 
       {/* Barras apiladas, agrupadas por zona pastoral */}
       <div className="mb-6 rounded-[10px] border border-[#e2e2da] bg-white px-4.5 py-4">
+        {/* Resumen: distribución del total de la arquidiócesis por nivel */}
+        <div className="border-b border-[#e2e2da] pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#5b6472]">
+          Toda la arquidiócesis
+        </div>
+        <div className="grid items-center gap-2.5 border-b-2 border-[#e2e2da] py-2.5 sm:grid-cols-[170px_1fr_44px]">
+          <div className="text-[12.5px] leading-tight">
+            <div className="font-bold">Total arquidiócesis</div>
+            <div className="text-[11px] text-[#8a93a3]">Distribución por nivel</div>
+          </div>
+          <BarraNiveles vals={totalesNivel} alta />
+          <div className="text-right font-bold text-mfc-green">{suma(totalesNivel)}</div>
+        </div>
         {ZONAS.map((z) => {
           const parroquias = parroquiasDeZona(z.id);
           if (parroquias.length === 0) return null;
           return (
             <div key={z.id}>
-              <div className="mt-3 border-b border-[#e2e2da] pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#5b6472] first:mt-0">
+              <div className="mt-3 border-b border-[#e2e2da] pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#5b6472]">
                 {z.nombre}
               </div>
               {parroquias.map((p) => {
@@ -61,29 +112,7 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
                       <div className="font-semibold">{p.lugar}</div>
                       <div className="text-[11px] text-[#8a93a3]">{p.nombre}</div>
                     </div>
-                    <div className="flex h-5 gap-[2px] overflow-hidden rounded bg-[#eef0ec]">
-                      {vals.map((v, i) => {
-                        if (!v) return null;
-                        // Barra al 100%: cada segmento es la proporción del
-                        // nivel dentro del total de la parroquia.
-                        const pct = total ? (v / total) * 100 : 0;
-                        const etiqueta = Math.round(pct);
-                        return (
-                          <div
-                            key={i}
-                            title={`${NIVELES[i]}: ${etiqueta}% (${v})`}
-                            className="flex items-center justify-center whitespace-nowrap rounded-[2px] text-[10.5px] font-semibold"
-                            style={{
-                              flex: `${pct} 1 0%`,
-                              background: COLOR_NIVEL[i],
-                              color: INK_NIVEL[i],
-                            }}
-                          >
-                            {pct >= 10 ? `${etiqueta}% (${v})` : pct >= 5 ? `${etiqueta}%` : ""}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <BarraNiveles vals={vals} />
                     <div className="text-right font-bold text-mfc-green">{total}</div>
                   </div>
                 );
