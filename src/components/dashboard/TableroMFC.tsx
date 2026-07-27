@@ -252,36 +252,32 @@ export default function TableroMFC() {
   return (
     <div className="tablero-cuerpo min-h-screen bg-mfc-papel text-mfc-tinta">
       {/* Encabezado */}
-      <header className="bg-mfc-green px-5 pb-4 pt-5 text-white">
-        <div className="mx-auto max-w-[980px]">
+      <header className="relative mx-3 mt-3 overflow-hidden rounded-2xl bg-mfc-green px-5 pb-4 pt-5 text-white sm:mx-5 sm:mt-5">
+        <Image
+          src="/mfc-logo-blanco.png"
+          alt=""
+          width={318}
+          height={499}
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-10 top-1/2 h-[140%] w-auto -translate-y-1/2 opacity-[0.07] mix-blend-soft-light select-none"
+        />
+        <div className="relative mx-auto max-w-[980px]">
           <div className="flex items-center justify-between gap-4">
             <div className="text-[11px] uppercase tracking-[.18em] text-[#EAD98F]">
-              Movimiento Familiar Cristiano · Arquidiócesis de San Pedro Sula
+              MFC Arquidiócesis · San Pedro Sula
             </div>
             <ChipSync sync={sync} reintentar={() => void enviar()} />
           </div>
-          <div className="mt-2 flex items-center gap-3.5">
-            <Image
-              src="/mfc-logo-blanco.png"
-              alt="Logo del Movimiento Familiar Cristiano"
-              width={318}
-              height={499}
-              priority
-              className="h-24 w-auto shrink-0"
-            />
-            <div>
-              <h1 className="tablero-display mb-0.5 text-3xl font-bold">
-                Área I — El MFC y su Mística
-              </h1>
-              <div className="text-[13px] text-[#CFE3D5]">
-                Responsables: Fabricio y Estéfany Puerto · Ciclo Básico de Formación 2026–2029
-              </div>
+          <div className="mt-2">
+            <h1 className="tablero-display mb-0.5 text-3xl font-bold">Tablero de Membresía</h1>
+            <div className="text-[13px] text-[#CFE3D5]">
+              Responsables: Fabricio y Estéfany Puerto · Ciclo Básico de Formación 2026–2029
             </div>
           </div>
-          <div className="mt-3.5 flex flex-wrap gap-6">
-            <Indicador etiqueta="Matrimonios en CBF" valor={String(totMat)} />
-            <Indicador etiqueta="Equipos (EBF)" valor={String(totEbf)} />
-            <Indicador
+          <div className="mt-3.5 flex flex-wrap gap-3">
+            <TarjetaIndicador etiqueta="Matrimonios en CBF" valor={String(totMat)} />
+            <TarjetaIndicador etiqueta="Equipos (EBF)" valor={String(totEbf)} />
+            <TarjetaIndicador
               etiqueta="Próxima jornada conyugal"
               valor={proximaJornada ? fmtFecha(proximaJornada.fecha) : "Sin programar"}
               sub={
@@ -424,7 +420,7 @@ function ChipSync({ sync, reintentar }: { sync: Sync; reintentar: () => void }) 
   }
 }
 
-function Indicador({
+function TarjetaIndicador({
   etiqueta,
   valor,
   sub,
@@ -436,7 +432,7 @@ function Indicador({
   chico?: boolean;
 }) {
   return (
-    <div>
+    <div className="rounded-xl bg-white/10 px-3.5 py-2.5 backdrop-blur-sm">
       <div className="text-[10px] uppercase tracking-[.12em] text-[#BFDCC8]">{etiqueta}</div>
       <div
         className={`${chico ? "tablero-cuerpo text-lg" : "tablero-display text-[28px]"} font-bold leading-tight text-white`}
