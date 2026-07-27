@@ -61,22 +61,9 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-green">
-          Matrimonios por parroquia y nivel
-        </h2>
-        <button
-          type="button"
-          onClick={guardarCorte}
-          className="cursor-pointer rounded-md bg-mfc-green px-3.5 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
-        >
-          Guardar corte de hoy
-        </button>
-      </div>
-      <p className="mt-0 text-[13px] text-[#5b6472]">
-        Toque cualquier número para editarlo. Al terminar una actualización, use
-        &ldquo;Guardar corte de hoy&rdquo; para registrar el estado en el historial.
-      </p>
+      <h2 className="tablero-display my-1.5 text-2xl font-bold text-mfc-green">
+        Matrimonios por parroquia y nivel
+      </h2>
 
       {/* Barras apiladas, agrupadas por zona pastoral */}
       <div className="mb-6 rounded-[10px] border border-[#e2e2da] bg-white px-4.5 py-4">
@@ -137,7 +124,13 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
         </div>
       </div>
 
-      <Tabla titulo="Matrimonios en el CBF" tipo="mat" datos={mat} setCelda={setCelda} />
+      <Tabla
+        titulo="Matrimonios en el CBF"
+        tipo="mat"
+        datos={mat}
+        setCelda={setCelda}
+        guardarCorte={guardarCorte}
+      />
       <Tabla
         titulo="Equipos Básicos de Formación (EBF)"
         tipo="ebf"
@@ -155,12 +148,15 @@ function Tabla({
   datos,
   setCelda,
   conResumen = false,
+  guardarCorte,
 }: {
   titulo: string;
   tipo: "ebf" | "mat";
   datos: Reporte;
   setCelda: Props["setCelda"];
   conResumen?: boolean;
+  // Solo la primera tabla editable lleva el botón de corte y su instrucción.
+  guardarCorte?: Props["guardarCorte"];
 }) {
   const totalesNivel = [0, 1, 2, 3].map((n) =>
     suma(PARROQUIAS.map((p) => datos[p.id][n] ?? 0)),
@@ -168,7 +164,24 @@ function Tabla({
 
   return (
     <div className="mb-6">
-      <h3 className="tablero-display mb-2 text-xl font-bold text-mfc-green">{titulo}</h3>
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="tablero-display text-xl font-bold text-mfc-green">{titulo}</h3>
+        {guardarCorte && (
+          <button
+            type="button"
+            onClick={guardarCorte}
+            className="cursor-pointer rounded-md bg-mfc-green px-3.5 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Guardar corte de hoy
+          </button>
+        )}
+      </div>
+      {guardarCorte && (
+        <p className="mb-2.5 mt-0 text-[13px] text-[#5b6472]">
+          Toque cualquier número para editarlo. Al terminar una actualización, use
+          &ldquo;Guardar corte de hoy&rdquo; para registrar el estado en el historial.
+        </p>
+      )}
       {conResumen && (
         <div className="mb-2.5 rounded-[10px] border border-[#e2e2da] bg-white px-4.5 py-2.5">
           <div className="grid items-center gap-2.5 sm:grid-cols-[170px_1fr_44px]">
