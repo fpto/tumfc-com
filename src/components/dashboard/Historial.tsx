@@ -62,7 +62,7 @@ export default function Historial({ snapshots, eliminarCorte }: Props) {
               <optgroup key={z.id} label={z.nombre}>
                 {parroquiasDeZona(z.id).map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.lugar} — {p.nombre}
+                    {p.nombre} — {p.lugar}
                   </option>
                 ))}
               </optgroup>

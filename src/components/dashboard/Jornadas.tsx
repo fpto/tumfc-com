@@ -83,7 +83,7 @@ export default function Jornadas({ jornadas, agregar, actualizar, eliminar }: Pr
                 <optgroup key={z.id} label={z.nombre}>
                   {parroquiasDeZona(z.id).map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.lugar} — {p.nombre}
+                      {p.nombre} — {p.lugar}
                     </option>
                   ))}
                 </optgroup>
@@ -194,8 +194,8 @@ function GrupoParroquia({
   return (
     <section>
       <h4 className="mb-1.5 text-sm font-bold text-[#16231B]">
-        {p?.lugar}{" "}
-        <span className="text-[12.5px] font-normal text-[#8a93a3]">· {p?.nombre}</span>
+        {p?.nombre}{" "}
+        <span className="text-[12.5px] font-normal text-[#8a93a3]">· {p?.lugar}</span>
       </h4>
       <div className="grid gap-2.5">{children}</div>
     </section>
