@@ -143,6 +143,7 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
         tipo="ebf"
         datos={ebf}
         setCelda={setCelda}
+        conResumen
       />
     </div>
   );
@@ -153,11 +154,13 @@ function Tabla({
   tipo,
   datos,
   setCelda,
+  conResumen = false,
 }: {
   titulo: string;
   tipo: "ebf" | "mat";
   datos: Reporte;
   setCelda: Props["setCelda"];
+  conResumen?: boolean;
 }) {
   const totalesNivel = [0, 1, 2, 3].map((n) =>
     suma(PARROQUIAS.map((p) => datos[p.id][n] ?? 0)),
@@ -166,6 +169,18 @@ function Tabla({
   return (
     <div className="mb-6">
       <h3 className="tablero-display mb-2 text-xl font-bold text-mfc-green">{titulo}</h3>
+      {conResumen && (
+        <div className="mb-2.5 rounded-[10px] border border-[#e2e2da] bg-white px-4.5 py-2.5">
+          <div className="grid items-center gap-2.5 sm:grid-cols-[170px_1fr_44px]">
+            <div className="text-[12.5px] leading-tight">
+              <div className="font-bold">Total arquidiócesis</div>
+              <div className="text-[11px] text-[#8a93a3]">Distribución por nivel</div>
+            </div>
+            <BarraNiveles vals={totalesNivel} alta />
+            <div className="text-right font-bold text-mfc-green">{suma(totalesNivel)}</div>
+          </div>
+        </div>
+      )}
       <div className="overflow-x-auto rounded-[10px] border border-[#e2e2da] bg-white">
         <table className="w-full border-collapse text-[13px]">
           <thead>
