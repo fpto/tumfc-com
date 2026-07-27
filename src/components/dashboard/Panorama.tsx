@@ -109,8 +109,8 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
                     className="grid items-center gap-2.5 border-b border-[#f0f0ea] py-[7px] sm:grid-cols-[170px_1fr_44px]"
                   >
                     <div className="text-[12.5px] leading-tight">
-                      <div className="font-semibold">{p.lugar}</div>
-                      <div className="text-[11px] text-[#8a93a3]">{p.nombre}</div>
+                      <div className="font-semibold">{p.nombre}</div>
+                      <div className="text-[11px] text-[#8a93a3]">{p.lugar}</div>
                     </div>
                     <BarraNiveles vals={vals} />
                     <div className="text-right font-bold text-mfc-green">{total}</div>
@@ -210,8 +210,8 @@ function Tabla({
                 ...parroquias.map((p) => (
                   <tr key={p.id} className="border-t border-[#f0f0ea]">
                     <td className="px-3 py-[7px]">
-                      <span className="font-semibold">{p.lugar}</span>
-                      <span className="text-[11.5px] text-[#8a93a3]"> · {p.nombre}</span>
+                      <span className="font-semibold">{p.nombre}</span>
+                      <span className="text-[11.5px] text-[#8a93a3]"> · {p.lugar}</span>
                     </td>
                     {[0, 1, 2, 3].map((n) => (
                       <td key={n} className="p-1 text-center">
@@ -221,7 +221,7 @@ function Tabla({
                           value={datos[p.id][n] ?? ""}
                           placeholder="—"
                           onChange={(e) => setCelda(tipo, p.id, n, e.target.value)}
-                          aria-label={`${p.lugar} ${NIVELES[n]}`}
+                          aria-label={`${p.nombre} ${p.lugar} ${NIVELES[n]}`}
                         />
                       </td>
                     ))}

@@ -286,7 +286,10 @@ export default function TableroMFC() {
               valor={proximaJornada ? fmtFecha(proximaJornada.fecha) : "Sin programar"}
               sub={
                 proximaJornada
-                  ? PARROQUIAS.find((p) => p.id === proximaJornada.parroquia)?.lugar
+                  ? (() => {
+                      const p = PARROQUIAS.find((x) => x.id === proximaJornada.parroquia);
+                      return p ? `${p.nombre} · ${p.lugar}` : undefined;
+                    })()
                   : undefined
               }
               chico
