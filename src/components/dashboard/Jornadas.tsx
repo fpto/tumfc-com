@@ -15,7 +15,7 @@ import {
 interface Props {
   jornadas: Jornada[];
   agregar: (j: Omit<Jornada, "id">) => void;
-  actualizar: (id: string, patch: Partial<Pick<Jornada, "estado" | "asistentes">>) => void;
+  actualizar: (id: string, patch: Partial<Pick<Jornada, "estado" | "asistentes" | "notas">>) => void;
   eliminar: (id: string) => void;
 }
 
@@ -234,6 +234,19 @@ function TarjetaJornada({
     setPidiendoAsistencia(false);
   }
 
+  const [editandoNota, setEditandoNota] = useState(false);
+  const [nota, setNota] = useState(j.notas ?? "");
+
+  function abrirEdicionNota() {
+    setNota(j.notas ?? "");
+    setEditandoNota(true);
+  }
+
+  function guardarNota() {
+    actualizar(j.id, { notas: nota.trim() === "" ? "" : nota.trim() });
+    setEditandoNota(false);
+  }
+
   return (
     <div
       className="rounded-[10px] border border-[#e2e2da] bg-white px-3.5 py-3"
@@ -264,7 +277,27 @@ function TarjetaJornada({
               </span>
             )}
           </div>
-          {j.notas && <div className="mt-1 text-[12.5px] text-[#5b6472]">{j.notas}</div>}
+          {j.notas && !editandoNota && (
+            <div className="mt-1 text-[12.5px] text-[#5b6472]">
+              {j.notas}{" "}
+              <button
+                type="button"
+                onClick={abrirEdicionNota}
+                className="cursor-pointer text-[11.5px] font-semibold text-[#3A6B4A] underline-offset-2 hover:underline"
+              >
+                Editar
+              </button>
+            </div>
+          )}
+          {!j.notas && !editandoNota && (
+            <button
+              type="button"
+              onClick={abrirEdicionNota}
+              className="mt-1 cursor-pointer text-[12.5px] font-semibold text-[#3A6B4A] underline-offset-2 hover:underline"
+            >
+              Agregar nota
+            </button>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {j.estado === "programada" && !pidiendoAsistencia && (
@@ -331,6 +364,37 @@ function TarjetaJornada({
           <button
             type="button"
             onClick={() => setPidiendoAsistencia(false)}
+            className="cursor-pointer rounded-md border border-[#d9d9cf] px-3 py-1.5 text-xs text-[#5b6472] hover:bg-neutral-50"
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
+
+      {editandoNota && (
+        <div className="mt-2.5 flex flex-wrap items-center gap-2.5 rounded-md bg-[#F6F5F1] px-3 py-2.5">
+          <label className="sr-only" htmlFor={`nota-${j.id}`}>
+            Nota
+          </label>
+          <input
+            id={`nota-${j.id}`}
+            type="text"
+            value={nota}
+            placeholder="Lugar, hora, equipo responsable…"
+            onChange={(e) => setNota(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && guardarNota()}
+            className={`${inputEstilo} min-w-[220px] flex-1`}
+          />
+          <button
+            type="button"
+            onClick={guardarNota}
+            className="cursor-pointer rounded-md bg-mfc-green px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+          >
+            Guardar
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditandoNota(false)}
             className="cursor-pointer rounded-md border border-[#d9d9cf] px-3 py-1.5 text-xs text-[#5b6472] hover:bg-neutral-50"
           >
             Cancelar
