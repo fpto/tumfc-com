@@ -67,6 +67,21 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
 
       {/* Barras apiladas, agrupadas por zona pastoral */}
       <div className="mb-6 rounded-[10px] border border-[#e2e2da] bg-white px-4.5 py-4">
+        <div className="mb-3 flex flex-wrap gap-4">
+          {NIVELES.map((n, i) => (
+            <span
+              key={n}
+              className="inline-flex items-center gap-1.5 text-[11.5px] text-[#5b6472]"
+            >
+              <span
+                className="inline-block h-3 w-3 rounded-[3px]"
+                style={{ background: COLOR_NIVEL[i] }}
+                aria-hidden="true"
+              />
+              {n}
+            </span>
+          ))}
+        </div>
         {/* Resumen: distribución del total de la arquidiócesis por nivel */}
         <div className="border-b border-[#e2e2da] pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#5b6472]">
           Toda la arquidiócesis
@@ -107,21 +122,6 @@ export default function Panorama({ ebf, mat, setCelda, guardarCorte }: Props) {
             </div>
           );
         })}
-        <div className="mt-3 flex flex-wrap gap-4">
-          {NIVELES.map((n, i) => (
-            <span
-              key={n}
-              className="inline-flex items-center gap-1.5 text-[11.5px] text-[#5b6472]"
-            >
-              <span
-                className="inline-block h-3 w-3 rounded-[3px]"
-                style={{ background: COLOR_NIVEL[i] }}
-                aria-hidden="true"
-              />
-              {n}
-            </span>
-          ))}
-        </div>
       </div>
 
       <Tabla
