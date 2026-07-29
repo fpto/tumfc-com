@@ -277,25 +277,16 @@ function TarjetaJornada({
               </span>
             )}
           </div>
-          {j.notas && !editandoNota && (
-            <div className="mt-1 text-[12.5px] text-[#5b6472]">
-              {j.notas}{" "}
-              <button
-                type="button"
-                onClick={abrirEdicionNota}
-                className="cursor-pointer text-[11.5px] font-semibold text-[#3A6B4A] underline-offset-2 hover:underline"
-              >
-                Editar
-              </button>
-            </div>
-          )}
-          {!j.notas && !editandoNota && (
+          {!editandoNota && (
             <button
               type="button"
               onClick={abrirEdicionNota}
-              className="mt-1 cursor-pointer text-[12.5px] font-semibold text-[#3A6B4A] underline-offset-2 hover:underline"
+              title="Clic para editar la nota"
+              className={`mt-1 block cursor-text rounded px-1 -mx-1 text-left text-[12.5px] transition-colors hover:bg-[#F6F5F1] ${
+                j.notas ? "text-[#5b6472]" : "italic text-[#8a93a3]"
+              }`}
             >
-              Agregar nota
+              {j.notas || "Agregar nota…"}
             </button>
           )}
         </div>
