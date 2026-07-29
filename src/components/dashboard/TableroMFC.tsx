@@ -219,7 +219,7 @@ export default function TableroMFC() {
   }
   function actualizarJornada(
     id: string,
-    patch: Partial<Pick<Jornada, "estado" | "asistentes">>,
+    patch: Partial<Pick<Jornada, "estado" | "asistentes" | "notas">>,
   ) {
     const nx = jornadas.map((j) => (j.id === id ? { ...j, ...patch } : j));
     setJornadas(nx);
